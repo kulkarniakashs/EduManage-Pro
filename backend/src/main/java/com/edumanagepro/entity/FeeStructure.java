@@ -31,4 +31,7 @@ public class FeeStructure extends BaseEntity {
 
     @Column(nullable = false)
     private boolean isActive = true;
+
+    public void setIsActive(boolean active) {
+    }
 }

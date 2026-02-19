@@ -34,4 +34,7 @@ public class Subject extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "teacher_id", nullable = false)
     private User teacher;
+
+    public void setIsActive(boolean b) {
+    }
 }

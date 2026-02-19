@@ -23,7 +23,10 @@ public class R2PublicStorageService {
     private int presignMinutes;
 
     public PresignedUpload presignProfilePhotoPut(UUID userId, String contentType) {
+        return presignGenericPut("profile-photos/" + userId, contentType);
+    }
 
+    public PresignedUpload presignGenericPut(String prefix, String contentType) {
         String ext = switch (contentType) {
             case "image/jpeg" -> ".jpg";
             case "image/png"  -> ".png";
@@ -31,7 +34,7 @@ public class R2PublicStorageService {
             default -> throw new RuntimeException("Unsupported contentType");
         };
 
-        String objectKey = "profile-photos/" + userId + "/" + UUID.randomUUID() + ext;
+        String objectKey = prefix + "/" + UUID.randomUUID() + ext;
 
         PutObjectRequest putReq = PutObjectRequest.builder()
                 .bucket(publicBucket)
@@ -45,7 +48,6 @@ public class R2PublicStorageService {
                 .build();
 
         String uploadUrl = presigner.presignPutObject(presignReq).url().toString();
-
         return new PresignedUpload(objectKey, uploadUrl, presignMinutes);
     }
 

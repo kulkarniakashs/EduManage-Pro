@@ -41,4 +41,7 @@ public class Announcement extends BaseEntity {
     private Instant publishAt = Instant.now();
 
     private Instant expiresAt; // optional (if you want later)
+
+    public void setIsActive(boolean b) {
+    }
 }

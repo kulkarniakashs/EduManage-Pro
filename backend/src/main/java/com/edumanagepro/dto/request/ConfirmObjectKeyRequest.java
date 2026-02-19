@@ -4,6 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
-public class ConfirmProfilePhotoRequest {
+public class ConfirmObjectKeyRequest {
     private String objectKey;
 }
