@@ -1,6 +1,7 @@
 package com.edumanagepro.entity;
 
 import com.edumanagepro.entity.enums.ContentType;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,6 +34,14 @@ public class ContentItem extends BaseEntity {
 
     private Integer durationSeconds;
 
+    private boolean protectedContent;
+
     @Column(nullable = false)
     private boolean isPublished = true;
+
+    private boolean uploadStatus = false;
+
+    public boolean getUploadStatus() {
+        return uploadStatus;
+    }
 }

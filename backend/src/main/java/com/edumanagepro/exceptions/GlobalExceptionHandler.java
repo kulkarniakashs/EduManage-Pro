@@ -33,12 +33,12 @@ public class GlobalExceptionHandler {
     // fallback (unexpected errors)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleAny(Exception ex, HttpServletRequest req) {
+        System.out.println(ex.toString());
         var status = 500;
         return ResponseEntity.status(status).body(new ApiError(
                 Instant.now(),
                 status,
-                "Internal Server Error",
-                "Something went wrong",
+                ex.getLocalizedMessage(), ex.getMessage(),
                 req.getRequestURI()
         ));
     }

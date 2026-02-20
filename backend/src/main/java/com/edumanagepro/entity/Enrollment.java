@@ -43,4 +43,8 @@ public class Enrollment extends BaseEntity {
 
     @Column(nullable = false)
     private boolean feeCleared = false; // updated when FeePayment SUCCESS
+
+    public Boolean getFeeCleared() {
+        return feeCleared;
+    }
 }
