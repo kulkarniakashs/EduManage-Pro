@@ -2,6 +2,7 @@ package com.edumanagepro.service;
 
 import com.edumanagepro.dto.response.ContentAccessUrlResponse;
 import com.edumanagepro.dto.response.ContentItemResponse;
+import com.edumanagepro.dto.response.StudentMyClassResponse;
 import com.edumanagepro.entity.ContentItem;
 import com.edumanagepro.repository.ContentItemRepository;
 import com.edumanagepro.security.AccessValidator;
@@ -29,4 +30,5 @@ public class StudentContentAccessService {
         var p = r2.presignGet(ci.getObjectKey());
         return new ContentAccessUrlResponse(ContentItemResponse.toContentItemResponse(ci),p.url(), p.expiresInMinutes());
     }
+
 }

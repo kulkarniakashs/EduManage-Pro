@@ -17,5 +17,8 @@ public interface SubjectRepository extends JpaRepository<Subject, UUID> {
     List<Subject> findByTeacherId(UUID teacherId);
 
     List<Subject> findByTeacherIdAndClassRoomId(UUID teacherId, UUID classRoomId);
+
+    List<Subject> findByClassRoomIdAndIsActiveTrue(UUID classRoomId);
+    List<Subject> findByTeacherIdAndIsActiveTrue(UUID teacherId);
 }
 
