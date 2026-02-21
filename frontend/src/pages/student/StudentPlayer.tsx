@@ -3,8 +3,8 @@ import { Link, useParams } from "react-router-dom";
 import { studentApi } from "../../api/studentApi";
 import type { ContentAccessUrlResponse } from "../../types/student";
 import { Card } from "../../components/student/Card";
-import { Skeleton } from "../../components/student/Skeleton";
-import { EmptyState } from "../../components/student/EmptyState";
+import { Skeleton } from "../../components/Skeleton";
+import { EmptyState } from "../../components/EmptyState";
 
 function formatMins(mins: number) {
   if (!Number.isFinite(mins)) return "-";

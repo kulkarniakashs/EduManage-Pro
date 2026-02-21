@@ -3,9 +3,11 @@ import { StudentLayout } from "./components/student/StudentLayout";
 import { StudentHome } from "./pages/student/StudentHome";
 import { StudentSubject } from "./pages/student/StudentSubject"
 import { StudentAnnouncements } from "./pages/student/StudentAnnouncements";
-import { StudentProfile } from "./pages/student/StudentProfile";
+// import { StudentProfile } from "./pages/student/StudentProfile";
 import { StudentVideoPlayer } from "./pages/student/StudentPlayer";
+import { StudentFees } from "./pages/student/StudentFees";
 import LoginPage from "./pages/Login";
+import ProfilePage from "./pages/ProfilePage";
 
 export default function App() {
   return (
@@ -17,8 +19,9 @@ export default function App() {
           <Route index element={<StudentHome />} />
           <Route path="subject/:subjectId" element={<StudentSubject />} />
           <Route path="announcements" element={<StudentAnnouncements />} />
-          <Route path="profile" element={<StudentProfile />} />
+          <Route path="profile" element={<ProfilePage />} />
           <Route path="player/:kind/:contentId" element={<StudentVideoPlayer />} />
+          <Route path="fees" element={<StudentFees />}></Route>
         </Route>
 
         <Route path="*" element={<Navigate to="/student" replace />} />

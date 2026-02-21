@@ -9,6 +9,6 @@ import java.util.UUID;
 public interface FeeStructureRepository extends JpaRepository<FeeStructure, UUID> {
 
     Optional<FeeStructure> findByAcademicYearIdAndClassRoomId(UUID academicYearId, UUID classRoomId);
-
+    Optional<FeeStructure> findByAcademicYearIdAndClassRoomIdAndIsActiveTrue(UUID academicYearId, UUID classRoomId);
     boolean existsByAcademicYearIdAndClassRoomId(UUID academicYearId, UUID classRoomId);
 }

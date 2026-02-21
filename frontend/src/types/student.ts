@@ -1,15 +1,23 @@
 export type UUID = string;
 
+export type MyClass = {
+  academicYearId : UUID;
+  academicYearName : String;
 
+  classRoomId : UUID;
+  classRoomName : String;
+  feeCleared : boolean;
+  subjects : SubjectSummary[];
+};
 
 export type SubjectSummary = {
   subjectId: UUID;
-   subjectName: string;
+  subjectName: string;
   description?: string;
   thumbnailUrl?: string | null;
-  teacherId: string,
-  teacherName : string, 
-  teacherProfilePhotoUrl : string;
+  teacherId: string;
+  teacherName: string;
+  teacherProfilePhotoUrl: string;
 };
 
 export type SubjectDetail = SubjectSummary;
@@ -32,9 +40,9 @@ export type ContentItem = {
 };
 
 export interface ContentAccessUrlResponse {
-    contentItem: ContentItem;
-    url: string;
-    expiresInMinutes: number; // int maps to number
+  contentItem: ContentItem;
+  url: string;
+  expiresInMinutes: number; // int maps to number
 }
 
 export type Announcement = {

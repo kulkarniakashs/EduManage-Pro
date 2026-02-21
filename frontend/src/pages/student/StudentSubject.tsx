@@ -2,11 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { studentApi } from "../../api/studentApi";
 import type { ContentItem,  ModuleResponse, SubjectDetailsWithModulesResponse } from "../../types/student";
-import { Avatar } from "../../components/student/Avatar";
+import { Avatar } from "../../components/Avatar";
 import { AccordionItem } from "../../components/student/Accordion";
 import { Card, CardContent } from "../../components/student/Card";
-import { EmptyState } from "../../components/student/EmptyState";
-import { Skeleton } from "../../components/student/Skeleton";
+import { EmptyState } from "../../components/EmptyState";
+import { Skeleton } from "../../components/Skeleton";
 
 
 function colorFromId(id: string) {

@@ -43,6 +43,7 @@ public class StudentContentQueryService {
                 enr.getAcademicYear().getName(),
                 enr.getClassRoom().getId(),
                 enr.getClassRoom().getName(),
+                enr.getFeeCleared(),
                 dto
         );
     }
@@ -78,4 +79,5 @@ public class StudentContentQueryService {
                 .map(ContentItemResponse::toContentItemResponse)
                 .toList();
     }
+
 }

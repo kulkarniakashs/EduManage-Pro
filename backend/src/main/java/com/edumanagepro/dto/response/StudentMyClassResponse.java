@@ -14,6 +14,7 @@ public class StudentMyClassResponse {
 
     private UUID classRoomId;
     private String classRoomName;
+    private Boolean feeCleared;
 
     private List<SubjectResponse> subjects;
 }

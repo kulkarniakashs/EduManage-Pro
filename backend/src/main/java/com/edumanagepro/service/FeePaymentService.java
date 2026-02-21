@@ -2,6 +2,7 @@ package com.edumanagepro.service;
 
 import com.edumanagepro.dto.request.SimulateFeePaymentRequest;
 import com.edumanagepro.dto.response.SimulateFeePaymentResponse;
+import com.edumanagepro.dto.response.StudentFeeSummaryResponse;
 import com.edumanagepro.entity.*;
 import com.edumanagepro.entity.enums.*;
 import com.edumanagepro.repository.*;
@@ -19,6 +20,51 @@ public class FeePaymentService {
     private final EnrollmentRepository enrollmentRepository;
     private final FeeStructureRepository feeStructureRepository;
     private final FeePaymentRepository feePaymentRepository;
+
+
+    public StudentFeeSummaryResponse getSummary(UUID studentId) {
+        Enrollment e = enrollmentRepository
+                .findFirstByStudentIdAndStatusOrderByCreatedAtDesc(studentId, EnrollmentStatus.ACTIVE)
+                .orElseThrow(() -> new RuntimeException("Active enrollment not found"));
+
+        FeeStructure fs = feeStructureRepository
+                .findByAcademicYearIdAndClassRoomIdAndIsActiveTrue(
+                        e.getAcademicYear().getId(),
+                        e.getClassRoom().getId()
+                )
+                .orElseThrow(() -> new RuntimeException("Fee structure not configured for your class"));
+
+        var latestOpt = feePaymentRepository.findFirstByStudentIdAndAcademicYearIdAndClassRoomIdOrderByCreatedAtDesc(
+                studentId, e.getAcademicYear().getId(), e.getClassRoom().getId()
+        );
+
+        StudentFeeSummaryResponse.LatestPayment latest = latestOpt.map(p ->
+                StudentFeeSummaryResponse.LatestPayment.builder()
+                        .paymentId(p.getId())
+                        .status(p.getStatus())
+                        .amount(p.getAmount())
+                        .currency(fs.getCurrency())
+                        .provider(p.getProvider())
+                        .orderId(p.getOrderId())
+                        .paymentIdRef(p.getPaymentId())
+                        .paidAt(p.getPaidAt())
+                        .createdAt(p.getCreatedAt())
+                        .build()
+        ).orElse(null);
+
+        return StudentFeeSummaryResponse.builder()
+                .academicYearId(e.getAcademicYear().getId())
+                .academicYearName(e.getAcademicYear().getName())
+                .classRoomId(e.getClassRoom().getId())
+                .classRoomName(e.getClassRoom().getName())
+                .feeCleared(Boolean.TRUE.equals(e.getFeeCleared()))
+                .feeStructureId(fs.getId())
+                .amount(fs.getAmount())
+                .currency(fs.getCurrency())
+                .feeStructureActive(fs.isActive())
+                .latestPayment(latest)
+                .build();
+    }
 
     @Transactional
     public SimulateFeePaymentResponse simulatePay(UUID studentId, SimulateFeePaymentRequest req) {

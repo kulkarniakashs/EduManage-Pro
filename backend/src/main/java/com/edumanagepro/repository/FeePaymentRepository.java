@@ -21,4 +21,8 @@ public interface FeePaymentRepository extends JpaRepository<FeePayment, UUID> {
     List<FeePayment> findByStudentIdAndAcademicYearId(UUID studentId, UUID academicYearId);
 
     Optional<FeePayment> findByOrderId(String orderId);
+
+    Optional<FeePayment> findFirstByStudentIdAndAcademicYearIdAndClassRoomIdOrderByCreatedAtDesc(
+            UUID studentId, UUID academicYearId, UUID classRoomId
+    );
 }
