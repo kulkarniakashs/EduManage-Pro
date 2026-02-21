@@ -47,7 +47,7 @@ public class ProfileService {
         User u = userRepository.findById(me.getId()).orElseThrow();
         u.setProfilePhotoKey(key);
 
-        return new MeResponse(u.getId(), u.getFullName(), u.getRole(), u.getProfilePhotoKey());
+        return new MeResponse(u.getId(), u.getFullName(), u.getRole(), u.getProfilePhotoKey(), u.getEmail());
     }
 
     public String myProfilePhotoUrl(UserPrincipal me) {
@@ -64,7 +64,7 @@ public class ProfileService {
             u.setFullName(req.getFullName().trim());
         }
 
-        return new MeResponse(u.getId(), u.getFullName(), u.getRole(), u.getProfilePhotoKey());
+        return new MeResponse(u.getId(), u.getFullName(), u.getRole(), u.getProfilePhotoKey(), u.getEmail());
     }
 
     @Transactional

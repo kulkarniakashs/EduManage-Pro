@@ -10,6 +10,6 @@ public class MeController {
 
     @GetMapping("/me")
     public MeResponse me(@AuthenticationPrincipal UserPrincipal user) {
-        return new MeResponse(user.getId(), user.getFullName(), user.getRole(), user.getProfilePhotoKey());
+        return new MeResponse(user.getId(), user.getFullName(), user.getRole(), user.getProfilePhotoKey(), user.getEmail());
     }
 }

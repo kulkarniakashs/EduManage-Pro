@@ -3,6 +3,7 @@ package com.edumanagepro.controller;
 import com.edumanagepro.dto.response.ContentItemResponse;
 import com.edumanagepro.dto.response.ModuleResponse;
 import com.edumanagepro.dto.response.StudentMyClassResponse;
+import com.edumanagepro.dto.response.SubjectDetailsWithModulesResponse;
 import com.edumanagepro.security.UserPrincipal;
 import com.edumanagepro.service.StudentContentQueryService;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,14 @@ public class StudentContentQueryController {
     @GetMapping("/me/class")
     public StudentMyClassResponse myClass(@AuthenticationPrincipal UserPrincipal me) {
         return studentContentQueryService.getMyClassAndSubjects(me.getId());
+    }
+
+    @GetMapping("/subjects/{subjectId}")
+    public SubjectDetailsWithModulesResponse subjectDetails(
+            @AuthenticationPrincipal UserPrincipal me,
+            @PathVariable UUID subjectId
+    ) {
+        return studentContentQueryService.subjectDetails(me.getId(), subjectId);
     }
 
     // GET /student/subjects/{subjectId}/modules

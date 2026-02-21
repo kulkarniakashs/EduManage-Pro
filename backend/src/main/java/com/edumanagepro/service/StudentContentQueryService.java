@@ -1,9 +1,6 @@
 package com.edumanagepro.service;
 
-import com.edumanagepro.dto.response.ContentItemResponse;
-import com.edumanagepro.dto.response.ModuleResponse;
-import com.edumanagepro.dto.response.StudentMyClassResponse;
-import com.edumanagepro.dto.response.SubjectResponse;
+import com.edumanagepro.dto.response.*;
 import com.edumanagepro.entity.Enrollment;
 import com.edumanagepro.entity.Module;
 import com.edumanagepro.entity.Subject;
@@ -50,9 +47,6 @@ public class StudentContentQueryService {
         );
     }
 
-
-    
-
     public List<ModuleResponse> listModules(UUID studentId, UUID subjectId) {
         accessValidator.validateStudentContentAccess(studentId, subjectId);
 
@@ -60,6 +54,13 @@ public class StudentContentQueryService {
                 .stream()
                 .map((ModuleResponse::toModuleResponse))
                 .toList();
+    }
+
+    public SubjectDetailsWithModulesResponse subjectDetails(UUID studentId, UUID subjectId){
+        accessValidator.validateStudentContentAccess(studentId, subjectId);
+        com.edumanagepro.entity.Subject sub = subjectRepository.findById(subjectId).orElseThrow();
+        List<ModuleResponse> moduleResponses = moduleRepository.findBySubjectId(subjectId).stream().map(ModuleResponse::toModuleResponse).toList();
+        return  new SubjectDetailsWithModulesResponse(sub.getId(),sub.getName(), sub.getDescription(), sub.getThumbnailUrl(), sub.getTeacher().getId(), sub.getTeacher().getFullName(), sub.getTeacher().getProfilePhotoKey(),  moduleResponses);
     }
 
     public List<ContentItemResponse> listPublishedContent(UUID studentId, UUID subjectId, UUID moduleId) {

@@ -13,4 +13,5 @@ public class MeResponse {
     private String name;
     private UserRole role;
     private String profilePhotoKey;
+    private String email;
 }

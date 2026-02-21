@@ -1,18 +1,18 @@
 package com.edumanagepro.dto.response;
 
+
 import com.edumanagepro.entity.Subject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
-public class SubjectResponse {
+public class SubjectDetailsWithModulesResponse {
     private UUID subjectId;
     private String subjectName;
     private String description;
@@ -20,9 +20,5 @@ public class SubjectResponse {
     private UUID teacherId;
     private String teacherName;
     private String teacherProfilePhotoUrl;
-
-    public static SubjectResponse toSubjectResponse(Subject sub){
-        return new SubjectResponse(sub.getId(), sub.getName(),sub.getDescription(),  sub.getThumbnailUrl(), sub.getTeacher().getId(), sub.getTeacher().getFullName(), sub.getTeacher().getProfilePhotoKey());
-    }
-
+    private List<ModuleResponse> modules;
 }
