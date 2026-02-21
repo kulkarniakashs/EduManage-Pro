@@ -1,4 +1,4 @@
-import {  useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { http } from "../lib/http";
 import { decodeToken, useJwt } from "react-jwt";
@@ -32,9 +32,9 @@ export default function LoginPage() {
   const sideColor = useMemo(() => colorFromSeed(roleHint), [roleHint]);
 
   const token = localStorage.getItem("token");
-  const { decodedToken, isExpired } = useJwt(token || '');
-  if(decodedToken && !isExpired){
-    let role : String = (decodedToken as any).role
+  const { decodedToken, isExpired } = useJwt(token || "");
+  if (decodedToken && !isExpired) {
+    let role: String = (decodedToken as any).role;
     navigate(`${role.toLocaleLowerCase}`);
   }
 
@@ -76,15 +76,7 @@ export default function LoginPage() {
 
             <div className="relative p-6">
               <div className="inline-flex items-center gap-2 rounded-2xl bg-white/70 px-4 py-2 text-slate-900 shadow-sm">
-                <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 text-white">
-                  E
-                </span>
-                <div>
-                  <div className="font-bold leading-tight">EduManage Pro</div>
-                  <div className="text-xs text-slate-600">
-                    Institutional LMS
-                  </div>
-                </div>
+                <img src="./logo.png" alt="logo" className="h-8 w-full"></img>
               </div>
 
               <div className="mt-10">

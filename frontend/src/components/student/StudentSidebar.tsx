@@ -27,10 +27,9 @@ export function StudentSidebar() {
       <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm h-full">
         <div className="flex flex-col justify-between h-full">
           <div>
-            <div className="text-slate-900 font-semibold text-lg">
-              EduManage
+            <div className="h-fit w-full flex justify-center">
+              <img className="h-20 w-[80%] object-contain" src="./logo.png" alt="logo"></img>
             </div>
-            <div className="text-slate-600 text-sm">Student Portal</div>
 
             <div className="mt-4 space-y-1">
               <Item to="/student" label="Subjects" />
