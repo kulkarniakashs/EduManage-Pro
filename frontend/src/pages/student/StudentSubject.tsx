@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { studentApi } from "../../api/studentApi";
 import type { ContentItem,  ModuleResponse, SubjectDetailsWithModulesResponse } from "../../types/student";
 import { Avatar } from "../../components/Avatar";
-import { AccordionItem } from "../../components/student/Accordion";
+import { AccordionItem } from "../../components/Accordion";
 import { Card, CardContent } from "../../components/student/Card";
 import { EmptyState } from "../../components/EmptyState";
 import { Skeleton } from "../../components/Skeleton";
@@ -75,6 +75,7 @@ const fetchModuleContent = async (moduleId: string) => {
       try {
         setLoading(true);
         const s = await studentApi.getSubject(subjectId);
+        console.log(s,"student subject");
         setSubject(s);
         setModules(s.modules);
 
@@ -153,7 +154,7 @@ const fetchModuleContent = async (moduleId: string) => {
             <div className="mt-3 flex items-center gap-2">
               <Avatar
                 name={subject.teacherName}
-                src={subject.teacherProfileUrl ? `${import.meta.env.VITE_APP_BUCKET}/${subject.teacherProfileUrl}` : null}
+                src={subject.teacherProfilePhotoUrl ? `${import.meta.env.VITE_APP_BUCKET}/${subject.teacherProfilePhotoUrl}` : null}
                 size={34}
               />
               <div className="leading-tight">

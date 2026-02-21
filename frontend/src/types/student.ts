@@ -83,6 +83,6 @@ export interface SubjectDetailsWithModulesResponse {
   thumbnailUrl?: string;
   teacherId: string;
   teacherName: string;
-  teacherProfileUrl?: string;
+  teacherProfilePhotoUrl?: string;
   modules: ModuleResponse[];
 }

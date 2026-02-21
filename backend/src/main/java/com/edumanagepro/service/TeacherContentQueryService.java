@@ -1,14 +1,17 @@
 package com.edumanagepro.service;
 
+import com.edumanagepro.dto.response.ContentAccessUrlResponse;
 import com.edumanagepro.dto.response.ContentItemResponse;
 import com.edumanagepro.dto.response.ModuleResponse;
 import com.edumanagepro.dto.response.TeacherSubjectResponse;
 import com.edumanagepro.entity.ContentItem;
 import com.edumanagepro.entity.Module;
 import com.edumanagepro.entity.Subject;
+import com.edumanagepro.exceptions.BadRequestException;
 import com.edumanagepro.repository.ContentItemRepository;
 import com.edumanagepro.repository.ModuleRepository;
 import com.edumanagepro.repository.SubjectRepository;
+import com.edumanagepro.security.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +25,7 @@ public class TeacherContentQueryService {
     private final SubjectRepository subjectRepository;
     private final ModuleRepository moduleRepository;
     private final ContentItemRepository contentItemRepository;
+    private final R2ContentStorageService r2;
 
     public List<TeacherSubjectResponse> mySubjects(UUID teacherId) {
         List<Subject> subjects = subjectRepository.findByTeacherIdAndIsActiveTrue(teacherId);
@@ -53,6 +57,18 @@ public class TeacherContentQueryService {
                 .stream()
                 .map(this::toContentDto)
                 .toList();
+    }
+
+    public ContentAccessUrlResponse contentAccessUrl(UserPrincipal user, UUID contentId){
+        ContentItem contentItem = contentItemRepository.findById(contentId).orElseThrow(()-> new RuntimeException("Content Item doesn't Exist"));
+//        if(contentItem.getModule().getSubject().getTeacher().getId().equals(user.getId())){
+//            throw new BadRequestException("You are not teacher of this subject");
+//        }
+        if(!contentItem.getModule().getSubject().getTeacher().getId().equals(user.getId())){
+            throw new BadRequestException("You are not teacher of this subject");
+        }
+        var p = r2.presignGet(contentItem.getObjectKey());
+        return new ContentAccessUrlResponse(ContentItemResponse.toContentItemResponse(contentItem), p.url(), p.expiresInMinutes());
     }
 
     private ModuleResponse toModuleDto(Module m) {

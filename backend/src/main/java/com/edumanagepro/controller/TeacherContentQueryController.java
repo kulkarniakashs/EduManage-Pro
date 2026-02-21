@@ -1,5 +1,6 @@
 package com.edumanagepro.controller;
 
+import com.edumanagepro.dto.response.ContentAccessUrlResponse;
 import com.edumanagepro.dto.response.ContentItemResponse;
 import com.edumanagepro.dto.response.ModuleResponse;
 import com.edumanagepro.dto.response.TeacherSubjectResponse;
@@ -43,5 +44,10 @@ public class TeacherContentQueryController {
             @PathVariable UUID moduleId
     ) {
         return teacherContentQueryService.listContentItems(me.getId(), moduleId);
+    }
+
+    @GetMapping("/content-item/{contentId}")
+    public ContentAccessUrlResponse contentAccessUrl(@AuthenticationPrincipal UserPrincipal me, @PathVariable UUID contentId){
+        return teacherContentQueryService.contentAccessUrl(me, contentId);
     }
 }

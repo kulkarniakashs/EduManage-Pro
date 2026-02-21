@@ -107,7 +107,7 @@ function SubjectCard({
           <div className="mt-4 flex items-center gap-2">
             <Avatar
               name={s.teacherName}
-              src={s.teacherProfilePhotoUrl || undefined}
+              src={s.teacherProfilePhotoUrl ? `${import.meta.env.VITE_APP_BUCKET}/${s.teacherProfilePhotoUrl}` : null}
               size={32}
             />
             <div className="min-w-0">

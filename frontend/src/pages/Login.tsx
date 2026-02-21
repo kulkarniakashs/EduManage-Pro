@@ -33,9 +33,11 @@ export default function LoginPage() {
 
   const token = localStorage.getItem("token");
   const { decodedToken, isExpired } = useJwt(token || "");
+
   if (decodedToken && !isExpired) {
     let role: String = (decodedToken as any).role;
-    navigate(`${role.toLocaleLowerCase}`);
+    console.log(role);
+    navigate(`/${role.toLocaleLowerCase()}`);
   }
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -53,7 +55,7 @@ export default function LoginPage() {
 
       const data = decodeToken(token);
       let role: String = (data as any).role;
-      navigate(`/${role.toLocaleLowerCase}`);
+      navigate(`/${role.toLocaleLowerCase()}`);
     } catch (err: any) {
       const msg =
         err?.response?.data?.message ||

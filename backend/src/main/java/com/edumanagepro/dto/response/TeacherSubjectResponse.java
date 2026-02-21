@@ -16,8 +16,9 @@ public class TeacherSubjectResponse {
     private UUID subjectId;
     private String subjectName;
     private String thumbnailUrl;
+    private String description;
 
     public static TeacherSubjectResponse toTeacherSubjectResponse(Subject sub){
-        return new TeacherSubjectResponse(sub.getId(), sub.getName(), sub.getThumbnailUrl());
+        return new TeacherSubjectResponse(sub.getId(), sub.getName(), sub.getThumbnailUrl(), sub.getDescription());
     }
 }
