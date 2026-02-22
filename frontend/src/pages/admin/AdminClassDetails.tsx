@@ -11,9 +11,11 @@ import { EmptyState } from "../../components/EmptyState";
 import { Skeleton } from "../../components/Skeleton";
 import { Avatar } from "../../components/Avatar";
 import { CreateSubjectModal } from "../../components/admin/CreateSubjectModal";
+import { EnrollStudentModal } from "../../components/admin/EnrollmentStudentModal";
 
 export function AdminClassDetail() {
   const { academicYearId = "", classRoomId = "" } = useParams();
+  const [showEnroll, setShowEnroll] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [subjects, setSubjects] = useState<AdminSubjectWithTeacher[]>([]);
@@ -74,6 +76,12 @@ export function AdminClassDetail() {
             className="rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
           >
             + Create Subject
+          </button>
+          <button
+            onClick={() => setShowEnroll(true)}
+            className="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50"
+          >
+            Enroll Student
           </button>
         </div>
       </div>
@@ -168,6 +176,16 @@ export function AdminClassDetail() {
           }}
         />
       ) : null}
+      <EnrollStudentModal
+        open={showEnroll}
+        academicYearId={academicYearId}
+        classRoomId={classRoomId}
+        onClose={() => setShowEnroll(false)}
+        onEnrolled={async () => {
+          // keep as is: reload page data (subjects + fee etc.)
+          await load();
+        }}
+      />
     </div>
   );
 }

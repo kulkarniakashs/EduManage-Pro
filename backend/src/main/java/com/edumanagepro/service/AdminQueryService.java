@@ -19,6 +19,19 @@ public class AdminQueryService {
     private final SubjectRepository subjectRepo;
     private final UserRepository userRepo;
     private final FeeStructureRepository feeRepo;
+    private final EnrollmentRepository enrollmentRepo;
+
+    public List<AdminStudentOptionResponse> listStudentsNotEnrolled(
+            UUID academicYearId,
+            UUID classRoomId
+    ) {
+
+        return enrollmentRepo.findStudentsNotEnrolled(academicYearId, classRoomId)
+                .stream()
+                .map(user -> new AdminStudentOptionResponse(user.getId(), user.getFullName(), user.getFullName(), user.getProfilePhotoKey())
+                )
+                .toList();
+    }
 
     public List<AdminAcademicYearResponse> listAcademicYears() {
         return academicYearRepo.findAllByOrderByCreatedAtDesc()

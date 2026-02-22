@@ -43,6 +43,14 @@ public class AdminQueryController {
         return adminQueryService.listTeachers();
     }
 
+    @GetMapping("/students/available")
+    public List<AdminStudentOptionResponse> listAvailableStudents(
+            @RequestParam UUID academicYearId,
+            @RequestParam UUID classRoomId
+    ) {
+        return adminQueryService.listStudentsNotEnrolled(academicYearId, classRoomId);
+    }
+
     @GetMapping("/fee-structures")
     public AdminFeeStructureResponse getFeeStructure(
             @RequestParam UUID academicYearId,

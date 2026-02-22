@@ -47,6 +47,7 @@ export type CreateSubjectRequest = {
   classRoomId: UUID;
   name: string;
   description?: string;
+  teacherId : UUID
 };
 
 export type AssignTeacherRequest = { teacherId: UUID };
@@ -57,4 +58,17 @@ export type CreateFeeStructureRequest = {
   amount: number;
   currency: string; // "INR"
   active: boolean;
+};
+
+export type AdminStudentOption = {
+  id: string;
+  name: string;
+  email: string;
+  profilePhotoKey?: string | null;
+};
+
+export type CreateEnrollmentRequest = {
+  academicYearId: string;
+  classRoomId: string;
+  studentId: string;
 };

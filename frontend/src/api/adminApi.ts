@@ -3,6 +3,7 @@ import type {
   AdminAcademicYear,
   AdminClassRoom,
   AdminFeeStructure,
+  AdminStudentOption,
   AdminSubjectWithTeacher,
   AdminTeacherOption,
   AssignTeacherRequest,
@@ -59,5 +60,17 @@ export const adminApi = {
   async setFeeStructure(req: CreateFeeStructureRequest) {
     const res = await http.post("/admin/fee-structures", req);
     return res.data;
+  },
+
+  //Enrollment
+    async listAvailableStudents(academicYearId: string, classRoomId: string): Promise<AdminStudentOption[]> {
+    const res = await http.get(
+      `/admin/students/available?academicYearId=${academicYearId}&classRoomId=${classRoomId}`
+    );
+    return res.data;
+  },
+
+  async enrollStudent(req: { academicYearId: string; classRoomId: string; studentId: string }): Promise<void> {
+    await http.post("/admin/enrollments", req);
   },
 };
