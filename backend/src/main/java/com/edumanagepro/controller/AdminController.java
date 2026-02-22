@@ -28,12 +28,13 @@ public class AdminController {
     }
 
     @PostMapping("/users")
-    public User createUser(@RequestBody CreateUserRequest req) {
-        return adminSetupService.createUser(req);
+    public User createUser(@AuthenticationPrincipal UserPrincipal userPrincipal,@RequestBody CreateUserRequest req) {
+        return adminSetupService.createUser(req,userPrincipal);
     }
 
     @PostMapping("/subjects")
     public Subject createSubject(@RequestBody CreateSubjectRequest req) {
+        System.out.println(req+ "incontroller");
         return adminSetupService.createSubject(req);
     }
 

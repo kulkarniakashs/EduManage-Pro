@@ -6,7 +6,6 @@ import java.util.UUID;
 
 @Getter @Setter
 public class CreateUserRequest {
-    private UUID instituteId;
     private String fullName;
     private String email;
     private String password;

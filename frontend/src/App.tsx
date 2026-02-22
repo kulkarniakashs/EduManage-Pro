@@ -13,6 +13,10 @@ import ProfilePage from "./pages/ProfilePage";
 import { VideoPlayer } from "./pages/VideoPlayer";
 import { studentApi } from "./api/studentApi";
 import { teacherApi } from "./api/teacherApi";
+import { AdminHome } from "./pages/admin/AdminHome";
+import { AdminClassDetail } from "./pages/admin/AdminClassDetails";
+import { AdminLayout } from "./components/admin/AdminLayout";
+import { AdminCreateUsersPage } from "./pages/admin/AdminCreateUserPage";
 
 export default function App() {
   return (
@@ -27,7 +31,7 @@ export default function App() {
           <Route path="profile" element={<ProfilePage />} />
           <Route
             path="player/:kind/:contentId"
-            element={< VideoPlayer contentItemUrl={studentApi.contentItemUrl}/>}
+            element={<VideoPlayer contentItemUrl={studentApi.contentItemUrl} />}
           />
           <Route path="fees" element={<StudentFees />}></Route>
         </Route>
@@ -37,11 +41,20 @@ export default function App() {
           <Route path="subject/:subjectId" element={<TeacherSubject />} />
           <Route
             path="player/:kind/:contentId"
-            element={<VideoPlayer contentItemUrl={teacherApi.contentItemUrl}/>}
+            element={<VideoPlayer contentItemUrl={teacherApi.contentItemUrl} />}
           />
           <Route path="profile" element={<ProfilePage />} />
         </Route>
 
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminHome />} />
+          <Route
+            path="class/:academicYearId/:classRoomId"
+            element={<AdminClassDetail />}
+          />
+          <Route path="users" element={<AdminCreateUsersPage/>} />
+          <Route path="profile" element={<ProfilePage />} />
+        </Route>
         {/* <Route path="*" element={<Navigate to="/student" replace />} /> */}
       </Routes>
     </BrowserRouter>

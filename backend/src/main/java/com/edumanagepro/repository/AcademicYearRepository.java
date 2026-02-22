@@ -14,4 +14,10 @@ public interface AcademicYearRepository extends JpaRepository<AcademicYear, UUID
     Optional<AcademicYear> findByInstituteIdAndIsActiveTrue(UUID instituteId);
 
     boolean existsByInstituteIdAndName(UUID instituteId, String name);
+
+    List<AcademicYear> findAllByOrderByCreatedAtDesc();
+
+    AcademicYear findFirstByOrderByCreatedAtDesc();
+
+    AcademicYear findByIdOrderByNameAsc(UUID id);
 }

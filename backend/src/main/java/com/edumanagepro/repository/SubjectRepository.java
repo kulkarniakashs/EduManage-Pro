@@ -3,6 +3,7 @@ package com.edumanagepro.repository;
 import com.edumanagepro.entity.Subject;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -19,6 +20,9 @@ public interface SubjectRepository extends JpaRepository<Subject, UUID> {
     List<Subject> findByTeacherIdAndClassRoomId(UUID teacherId, UUID classRoomId);
 
     List<Subject> findByClassRoomIdAndIsActiveTrue(UUID classRoomId);
+
     List<Subject> findByTeacherIdAndIsActiveTrue(UUID teacherId);
+
+    List<Subject> findByClassRoomIdOrderByNameAsc(UUID classRoomId);
 }
 

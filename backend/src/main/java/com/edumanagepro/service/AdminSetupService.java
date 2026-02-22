@@ -4,6 +4,7 @@ import com.edumanagepro.dto.request.*;
 import com.edumanagepro.entity.*;
 import com.edumanagepro.entity.enums.*;
 import com.edumanagepro.repository.*;
+import com.edumanagepro.security.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -51,9 +52,9 @@ public class AdminSetupService {
         return classRoomRepository.save(c);
     }
 
-    public User createUser(CreateUserRequest req) {
-        Institute inst = instituteRepository.findById(req.getInstituteId()).orElseThrow();
-
+    public User createUser(CreateUserRequest req, UserPrincipal me) {
+        User admin = userRepository.findById(me.getId()).orElseThrow(()-> new RuntimeException("Your institute is not defined"));
+        Institute inst = admin.getInstitute();
         if (req.getRole() == null || (req.getRole() != UserRole.TEACHER && req.getRole() != UserRole.STUDENT)) {
             throw new RuntimeException("Role must be TEACHER or STUDENT");
         }
@@ -73,6 +74,7 @@ public class AdminSetupService {
     }
 
     public Subject createSubject(CreateSubjectRequest req) {
+        System.out.println(req + "In Create Subject");
         ClassRoom classRoom = classRoomRepository.findById(req.getClassRoomId()).orElseThrow();
         User teacher = userRepository.findById(req.getTeacherId()).orElseThrow();
 
@@ -82,7 +84,7 @@ public class AdminSetupService {
         s.setClassRoom(classRoom);
         s.setTeacher(teacher);
         s.setName(req.getName());
-        s.setCode(req.getCode());
+//        s.setCode(req.getCode());
         s.setDescription(req.getDescription());
         s.setThumbnailUrl(req.getThumbnailUrl()); // optional
         s.setIsActive(true);
