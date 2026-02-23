@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.net.ssl.SSLSession;
+
 @Entity
 @Table(name = "subjects",
         uniqueConstraints = @UniqueConstraint(
@@ -37,4 +39,5 @@ public class Subject extends BaseEntity {
 
     public void setIsActive(boolean b) {
     }
+
 }

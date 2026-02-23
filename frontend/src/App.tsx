@@ -17,6 +17,9 @@ import { AdminHome } from "./pages/admin/AdminHome";
 import { AdminClassDetail } from "./pages/admin/AdminClassDetails";
 import { AdminLayout } from "./components/admin/AdminLayout";
 import { AdminCreateUsersPage } from "./pages/admin/AdminCreateUserPage";
+import { TeacherAttendanceHome } from "./pages/teacher/TeacherAttendanceHome";
+import { TeacherAttendanceSubject } from "./pages/teacher/TeacherAttendanceSubject";
+import { StudentAttendancePage } from "./pages/student/StudentAttendancePage";
 
 export default function App() {
   return (
@@ -34,6 +37,7 @@ export default function App() {
             element={<VideoPlayer contentItemUrl={studentApi.contentItemUrl} />}
           />
           <Route path="fees" element={<StudentFees />}></Route>
+          <Route path="attendance" element={<StudentAttendancePage/>} />
         </Route>
 
         <Route path="/teacher" element={<TeacherLayout />}>
@@ -44,6 +48,8 @@ export default function App() {
             element={<VideoPlayer contentItemUrl={teacherApi.contentItemUrl} />}
           />
           <Route path="profile" element={<ProfilePage />} />
+          <Route path="attendance" element={<TeacherAttendanceHome/>}/>
+          <Route path="attendance/:subjectId" element={<TeacherAttendanceSubject/>} />
         </Route>
 
         <Route path="/admin" element={<AdminLayout />}>

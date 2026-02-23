@@ -1,1 +1,58 @@
-@import "tailwindcss"
+@import "tailwindcss";
+
+
+/* Make entire heatmap compact */
+.react-calendar-heatmap {
+  width: 100%;
+  font-size: 9px;
+}
+
+@media (max-width: 768px) {
+  .react-calendar-heatmap {
+    font-size: 7px;
+  }
+
+  .react-calendar-heatmap rect {
+    width: 4px !important;
+    height: 4px !important;
+  }
+}
+
+/* Reduce month labels size */
+.react-calendar-heatmap .react-calendar-heatmap-month-label {
+  font-size: 9px !important;
+  fill: #64748b; /* slate-500 */
+}
+
+/* Reduce weekday labels size */
+.react-calendar-heatmap .react-calendar-heatmap-weekday-label {
+  font-size: 8px !important;
+  fill: #94a3b8; /* slate-400 */
+}
+
+/* Reduce square size */
+.react-calendar-heatmap rect {
+  width: 8px !important;
+  height: 8px !important;
+  rx: 2;
+  ry: 2;
+}
+
+/* Reduce spacing between rows */
+.react-calendar-heatmap g > rect {
+  margin: 0 !important;
+}
+
+/* Colors */
+.react-calendar-heatmap .color-empty {
+  fill: #ffffff;
+  stroke: #e2e8f0;
+}
+
+.react-calendar-heatmap .color-present {
+  fill: #34d399;
+}
+
+.react-calendar-heatmap .color-absent {
+  fill: #fb7185;
+}

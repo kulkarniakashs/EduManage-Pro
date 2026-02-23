@@ -33,6 +33,7 @@ export function TeacherSidebar() {
 
             <div className="mt-4 space-y-1">
               <Item to="/teacher" label="Subjects" />
+              <Item to="/teacher/attendance" label="Attendance" />
               <Item to="/teacher/profile" label="Profile" />
             </div>
           </div>

@@ -34,5 +34,13 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, UUID> {
     )
 """)
     List<User> findStudentsNotEnrolled(UUID academicYearId, UUID classRoomId);
+
+
+    @Query("""
+        select e from Enrollment e
+        where e.academicYear.id = :academicYearId
+          and e.classRoom.id = :classRoomId
+        """)
+    List<Enrollment> findByAcademicYearAndClassRoom(UUID academicYearId, UUID classRoomId);
 }
 

@@ -35,6 +35,7 @@ export function StudentSidebar() {
               <Item to="/student" label="Subjects" />
               <Item to="/student/announcements" label="Announcements" />
               <Item to="/student/profile" label="Profile" />
+              <Item to="/student/attendance" label="Attendance" />
               <Item to="/student/fees" label="Fees" />
             </div>
           </div>
