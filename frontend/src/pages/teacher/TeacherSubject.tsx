@@ -90,7 +90,7 @@ export function TeacherSubject() {
         title: mTitle.trim(),
         description: mDesc.trim(),
       });
-      setModules((prev) => [created, ...prev]);
+      setModules((prev) => [...prev, created]);
       setMTitle("");
       setMDesc("");
     } catch (e: any) {
@@ -120,8 +120,13 @@ export function TeacherSubject() {
       await teacherApi.confirmSubjectThumbnail(subjectId, {
         objectKey: presign.objectKey,
       });
-      await load();
-      alert("Thumbnail updated.");
+      setSubject((prev) => {
+        if (!prev) return null; // If state is null, we can't spread it
+        return {
+          ...prev,
+          thumbnailUrl: presign.objectKey || "",
+        };
+      });
     } catch (e: any) {
       alert(
         e?.response?.data?.message ||
@@ -130,8 +135,6 @@ export function TeacherSubject() {
       );
     }
   };
-
-
 
   if (loading) {
     return (

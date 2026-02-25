@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from "react";
 import axios from "axios";
 import type { ContentType, ContentItem } from "../../types/teacher";
 import { teacherApi } from "../../api/teacherApi";
+import { getVideoDuration } from "../../lib/getVideoDuration";
 
 type Props = {
   open: boolean;
@@ -75,8 +76,12 @@ export function UploadContentModal({
       setUploading(true);
       setProgress(0);
 
-      const contentType =
-        file.type || (type === "PDF" ? "application/pdf" : "video/mp4");
+      const contentType = file.type || (type === "PDF" ? "application/pdf" : "video/mp4");
+
+      let duration : number = 0;
+      if(type == 'VIDEO'){
+        duration = await getVideoDuration(file);
+      }
 
       // 1) init upload (get presigned PUT url + contentItem id)
       const init = await teacherApi.initUpload(moduleId, {
@@ -84,6 +89,7 @@ export function UploadContentModal({
         description: description.trim() || undefined,
         type,
         contentType,
+        duration,
         published,
         protectedContent,
       });

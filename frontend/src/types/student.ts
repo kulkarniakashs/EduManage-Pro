@@ -86,3 +86,28 @@ export interface SubjectDetailsWithModulesResponse {
   teacherProfilePhotoUrl?: string;
   modules: ModuleResponse[];
 }
+
+
+export type ConsumptionStatus = "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
+
+// export type ContentType = "VIDEO" | "PDF";
+
+export type ContentItemWithConsumption = {
+  id: string;
+  moduleId: string;
+  title: string;
+  description?: string;
+  type: ContentType;
+  objectKey: string;
+
+  // NEW
+  consumptionStatus?: ConsumptionStatus;
+  progressPercent?: number;       // for VIDEO
+  visited?: boolean;              // for PDF
+  lastPositionSeconds?: number;   // for VIDEO resume
+};
+
+export type VideoProgressRequest = {
+  currentSeconds: number;
+  durationSeconds: number;
+};

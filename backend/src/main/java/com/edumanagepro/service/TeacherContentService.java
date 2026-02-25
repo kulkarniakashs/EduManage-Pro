@@ -63,6 +63,11 @@ public class TeacherContentService {
         ci.setTitle(req.getTitle());
         ci.setDescription(req.getDescription());
         ci.setType(req.getType());
+        if(req.getType() == ContentType.VIDEO){
+            ci.setDurationSeconds(req.getDuration());
+        } else {
+            ci.setDurationSeconds(null);
+        }
         ci.setPublished(req.isPublished());
         ci.setProtectedContent(req.isProtectedContent());
         ci.setUploadStatus(false);

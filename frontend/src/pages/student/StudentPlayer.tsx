@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { studentApi } from "../../api/studentApi";
 import type { ContentAccessUrlResponse } from "../../types/student";
 import { Card } from "../../components/student/Card";
@@ -17,11 +17,13 @@ function formatMins(mins: number) {
 export function StudentVideoPlayer() {
   const { contentId = "" } = useParams();
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const navigate = useNavigate();
+  const [searchParams, ] = useSearchParams();
+  const t = searchParams.get('t');
 
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<ContentAccessUrlResponse | null>(null);
   const [error, setError] = useState<string>("");
-
   // small key to force reload when URL changes
   const playerKey = useMemo(() => contentId, [contentId]);
 
@@ -34,11 +36,14 @@ export function StudentVideoPlayer() {
         setError("");
         setData(null);
 
+        console.log("contentid",contentId)
         const res = await studentApi.contentItemUrl(contentId);
 
         // protect if component unmounted / param changed quickly
         if (!alive) return;
-
+        if(t){
+          res.url = res.url + `#t=${t}`
+        }
         setData(res);
       } catch (e: any) {
         if (!alive) return;
@@ -62,12 +67,64 @@ export function StudentVideoPlayer() {
     if (!data?.url) return;
     const v = videoRef.current;
     if (!v) return;
-
     // try autoplay politely (may be blocked without user gesture)
     v.play().catch(() => {
       // ignore autoplay block
     });
   }, [data?.url]);
+
+  // ✅ send video progress
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v || !contentId) return;
+
+    let lastSentAt = 0;
+
+    const sendProgress = async () => {
+      const now = Date.now();
+      if (now - lastSentAt < 30000) return; // throttle every 30s
+      lastSentAt = now;
+
+      const durationSeconds = Number.isFinite(v.duration)
+        ? Math.floor(v.duration)
+        : 0;
+      const currentSeconds = Number.isFinite(v.currentTime)
+        ? Math.floor(v.currentTime)
+        : 0;
+
+      // ✅ API: POST /student/content/{id}/video-progress
+      const res =  await studentApi.videoProgress?.(contentId, { currentSeconds, durationSeconds }).catch(() => {});
+      console.log("video -progress", res);
+    };
+
+    const sendProgressUnthrottled = () => {
+      const durationSeconds = Number.isFinite(v.duration)
+        ? Math.floor(v.duration)
+        : 0;
+      const currentSeconds = Number.isFinite(v.currentTime)
+        ? Math.floor(v.currentTime)
+        : 0;
+      studentApi.videoProgress?.(contentId, { currentSeconds, durationSeconds }).catch(() => {});
+    };
+
+    // while playing
+    v.addEventListener("timeupdate", sendProgress);
+
+    // on user action
+    v.addEventListener("pause", sendProgressUnthrottled);
+    v.addEventListener("ended", sendProgressUnthrottled);
+
+    // on leaving page / refresh
+    const onBeforeUnload = () => sendProgressUnthrottled();
+    window.addEventListener("beforeunload", onBeforeUnload);
+
+    return () => {
+      v.removeEventListener("timeupdate", sendProgress);
+      v.removeEventListener("pause", sendProgressUnthrottled);
+      v.removeEventListener("ended", sendProgressUnthrottled);
+      window.removeEventListener("beforeunload", onBeforeUnload);
+    };
+  }, [contentId, data?.url]);
 
   if (loading) {
     return (
@@ -82,12 +139,12 @@ export function StudentVideoPlayer() {
   if (error) {
     return (
       <div className="grid gap-4">
-        <Link
-          to="/student"
+        <button
+          onClick={()=> navigate(-1)}
           className="text-sm font-medium text-slate-700 hover:text-slate-900"
         >
           ← Back
-        </Link>
+        </button>
         <EmptyState title="Failed to load video" hint={error} />
       </div>
     );
@@ -96,27 +153,27 @@ export function StudentVideoPlayer() {
   if (!data) {
     return (
       <div className="grid gap-4">
-        <Link
-          to="/student"
+        <button
+          onClick={()=> navigate(-1)}
           className="text-sm font-medium text-slate-700 hover:text-slate-900"
         >
           ← Back
-        </Link>
+        </button>
         <EmptyState title="No data" hint="No access URL received." />
       </div>
     );
   }
 
   const { contentItem, url, expiresInMinutes } = data;
-
+  
   return (
     <div className="grid gap-4">
-      <Link
-        to="/student"
-        className="text-sm font-medium text-slate-700 hover:text-slate-900"
+      <button
+        onClick={()=> navigate(-1)}
+        className="text-sm font-medium text-slate-700 hover:text-slate-900 flex justify-start"
       >
-        ← Back to Subjects
-      </Link>
+        ← Back to Subject
+      </button>
 
       {/* Header */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">

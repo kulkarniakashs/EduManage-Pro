@@ -30,7 +30,8 @@ export interface StudentFeeSummaryResponse {
 }
 
 export interface SimulateFeePaymentRequest {
-  feeStructureId: UUID;
+  academicYearId : UUID,
+  classRoomId : UUID
 }
 
 export interface SimulateFeePaymentResponse {

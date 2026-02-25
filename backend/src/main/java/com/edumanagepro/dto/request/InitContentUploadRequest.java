@@ -11,6 +11,7 @@ public class InitContentUploadRequest {
 
     private ContentType type;      // VIDEO / PDF
     private String contentType;    // application/pdf, video/mp4, etc.
+    private int duration;
 
     private boolean published = true;
     private boolean protectedContent = true; // keep true for paid content

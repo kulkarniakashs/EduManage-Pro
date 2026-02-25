@@ -1,13 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { studentApi } from "../../api/studentApi";
-import type { ContentItem,  ModuleResponse, SubjectDetailsWithModulesResponse } from "../../types/student";
+import type {
+  ModuleResponse,
+  SubjectDetailsWithModulesResponse,
+  ContentItemWithConsumption,
+} from "../../types/student";
 import { Avatar } from "../../components/Avatar";
 import { AccordionItem } from "../../components/Accordion";
 import { Card, CardContent } from "../../components/student/Card";
 import { EmptyState } from "../../components/EmptyState";
 import { Skeleton } from "../../components/Skeleton";
-
+import { ProgressBar } from "../../components/student/ProgressBar";
 
 function colorFromId(id: string) {
   const colors = [
@@ -47,26 +51,34 @@ export function StudentSubject() {
   const { subjectId = "" } = useParams();
   const nav = useNavigate();
 
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [subject, setSubject] = useState<SubjectDetailsWithModulesResponse | null>(null);
+  const [subject, setSubject] =
+    useState<SubjectDetailsWithModulesResponse | null>(null);
   const [modules, setModules] = useState<ModuleResponse[]>([]);
   // const [contentByModule, setContentByModule] = useState<Record<string, ContentItem[]>>({});
 
-  const [contentByModule, setContentByModule] = useState<Record<string, ContentItem[]>>({});
-const [loadingModuleId, setLoadingModuleId] = useState<string | null>(null);
+  const [contentByModule, setContentByModule] = useState<
+    Record<string, ContentItemWithConsumption[]>
+  >({});
+  const [loadingModuleId, setLoadingModuleId] = useState<string | null>(null);
 
-const fetchModuleContent = async (moduleId: string) => {
-  // already cached → don’t refetch
-  if (contentByModule[moduleId]) return;
+  const fetchModuleContent = async (moduleId: string) => {
+    // already cached → don’t refetch
+    if (contentByModule[moduleId]) return;
 
-  try {
-    setLoadingModuleId(moduleId);
-    const items = await studentApi.listModuleContent(subjectId || "",moduleId);
-    setContentByModule((prev) => ({ ...prev, [moduleId]: items }));
-  } finally {
-    setLoadingModuleId(null);
-  }
-};
+    try {
+      setLoadingModuleId(moduleId);
+      const items = await studentApi.listModuleContent(
+        subjectId || "",
+        moduleId,
+      );
+      console.log("items", items);
+      setContentByModule((prev) => ({ ...prev, [moduleId]: items }));
+    } finally {
+      setLoadingModuleId(null);
+    }
+  };
 
   const fallback = useMemo(() => colorFromId(subjectId), [subjectId]);
 
@@ -75,18 +87,21 @@ const fetchModuleContent = async (moduleId: string) => {
       try {
         setLoading(true);
         const s = await studentApi.getSubject(subjectId);
-        console.log(s,"student subject");
+        console.log(s, "student subject");
         setSubject(s);
         setModules(s.modules);
 
         const pairs = await Promise.all(
-          modules.map(async (mod : ModuleResponse) => {
-            const items = await studentApi.listModuleContent(subjectId || "",mod.id);
+          modules.map(async (mod: ModuleResponse) => {
+            const items = await studentApi.listModuleContent(
+              subjectId || "",
+              mod.id,
+            );
             return [mod.id, items] as const;
-          })
+          }),
         );
 
-        const map: Record<string, ContentItem[]> = {};
+        const map: Record<string, ContentItemWithConsumption[]> = {};
         for (const [mid, items] of pairs) map[mid] = items;
         setContentByModule(map);
       } finally {
@@ -95,20 +110,35 @@ const fetchModuleContent = async (moduleId: string) => {
     })();
   }, [subjectId]);
 
-  const openContent =async (it: ContentItem) => {
+  const openContent = async (it: ContentItemWithConsumption) => {
+    console.log(it,"it");
     if (it.type === "VIDEO") {
-      nav(`/student/player/video/${it.id}`, { state: { content: it, subjectId } });
+      let url = `/student/player/video/${it.id}`
+      if(it.lastPositionSeconds){
+        url = url + `?t=${it.lastPositionSeconds}`;
+      }
+      nav(url, {
+        state: { content: it, subjectId },
+      });
       return;
     }
 
     // PDF: open in new tab
     const url = await studentApi.contentItemUrl(it.id);
-    window.open(url.url, '_blank')
+    await studentApi.markVisited(it.id);
+    window.open(url.url, "_blank");
   };
+
+  function videoState(it: ContentItemWithConsumption) {
+    // prefer consumptionStatus; fallback to visited
+    const st =
+      it.consumptionStatus ?? (it.visited ? "IN_PROGRESS" : "NOT_STARTED");
+    return st as "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
+  }
 
   if (loading) {
     return (
-      <div className="grid gap-4">
+      <div className="grid gap-2">
         <Skeleton className="h-10 w-40" />
         <Skeleton className="h-40" />
         <Skeleton className="h-24" />
@@ -117,20 +147,30 @@ const fetchModuleContent = async (moduleId: string) => {
   }
 
   if (!subject) {
-    return <EmptyState title="Subject not found" hint="Go back and try again." />;
+    return (
+      <EmptyState title="Subject not found" hint="Go back and try again." />
+    );
   }
 
   return (
     <div className="grid gap-4">
       <div className="flex items-center justify-between">
-        <Link to="/student" className="text-sm font-medium text-slate-700 hover:text-slate-900">
+        <button
+          onClick={() => navigate(-1)}
+          className="text-sm font-medium text-slate-700 hover:text-slate-900"
+        >
           ← Back to Subjects
-        </Link>
+        </button>
       </div>
 
       {/* ✅ Full-width banner thumbnail */}
       <Card className="overflow-hidden">
-        <div className={["relative w-full", subject.thumbnailUrl ? "" : fallback].join(" ")}>
+        <div
+          className={[
+            "relative w-full",
+            subject.thumbnailUrl ? "" : fallback,
+          ].join(" ")}
+        >
           <div className="h-48 w-full sm:h-56">
             {subject.thumbnailUrl ? (
               <img
@@ -154,11 +194,17 @@ const fetchModuleContent = async (moduleId: string) => {
             <div className="mt-3 flex items-center gap-2">
               <Avatar
                 name={subject.teacherName}
-                src={subject.teacherProfilePhotoUrl ? `${import.meta.env.VITE_APP_BUCKET}/${subject.teacherProfilePhotoUrl}` : null}
+                src={
+                  subject.teacherProfilePhotoUrl
+                    ? `${import.meta.env.VITE_APP_BUCKET}/${subject.teacherProfilePhotoUrl}`
+                    : null
+                }
                 size={34}
               />
               <div className="leading-tight">
-                <div className="text-white font-semibold">{subject.teacherName}</div>
+                <div className="text-white font-semibold">
+                  {subject.teacherName}
+                </div>
                 <div className="text-xs text-white/80">Teacher</div>
               </div>
             </div>
@@ -173,51 +219,76 @@ const fetchModuleContent = async (moduleId: string) => {
         </CardContent>
       </Card>
 
-{modules.map((m) => {
-  const items = contentByModule[m.id] ?? [];
-  const isLoading = loadingModuleId === m.id;
+      {modules.map((m) => {
+        const items = contentByModule[m.id] ?? [];
+        const isLoading = loadingModuleId === m.id;
 
-  return (
-    <AccordionItem
-      key={m.id}
-      title={m.title}
-      subtitle={m.description}
-      // right={<Badge>{(contentByModule[m.id]?.length ?? 0)} items</Badge>}
-      onToggle={(open) => {
-        if (open) fetchModuleContent(m.id);
-      }}
-    >
-      {isLoading ? (
-        <div className="grid gap-2">
-          <Skeleton className="h-12" />
-          <Skeleton className="h-12" />
-        </div>
-      ) : items.length === 0 ? (
-        <EmptyState title="No content in this module" />
-      ) : (
-        <div className="grid gap-2">
-          {items.map((it) => (
-            <button
-              key={it.id}
-              onClick={() => openContent(it)}
-              className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-3 hover:bg-slate-50"
-            >
-              <ContentIcon kind={it.type} />
-
-              <div className="min-w-0 flex-1 text-left">
-                <div className="font-medium text-slate-900 truncate">{it.title}</div>
-                <div className="mt-0.5 text-xs text-slate-500">{kindLabel(it.type)}</div>
+        return (
+          <AccordionItem
+            key={m.id}
+            title={m.title}
+            subtitle={m.description}
+            // right={<Badge>{(contentByModule[m.id]?.length ?? 0)} items</Badge>}
+            onToggle={(open) => {
+              if (open) fetchModuleContent(m.id);
+            }}
+          >
+            {isLoading ? (
+              <div className="grid gap-2">
+                <Skeleton className="h-12" />
+                <Skeleton className="h-12" />
               </div>
+            ) : items.length === 0 ? (
+              <EmptyState title="No content in this module" />
+            ) : (
+              <div className="grid gap-2">
+                {items.map((it) => {
+                  const isVideo = it.type === "VIDEO";
+                  const vState = isVideo ? videoState(it) : null;
 
-              <span className="text-slate-400">→</span>
-            </button>
-          ))}
-        </div>
-      )}
-    </AccordionItem>
-  );
-})}
+                  return (
+                    <button
+                      key={it.id}
+                      onClick={() => openContent(it)}
+                      className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white px-3 py-3 hover:bg-slate-50"
+                    >
+                      <ContentIcon kind={it.type} />
 
+                      <div className="min-w-0 flex-1 text-left">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="font-medium text-slate-900 truncate">
+                              {it.title}
+                            </div>
+                            <div className="mt-0.5 text-xs text-slate-500">
+                              {kindLabel(it.type)}
+                            </div>
+                          </div>
+                        </div>
+
+                        {isVideo && vState === "IN_PROGRESS" ? (
+                          <ProgressBar value={it.progressPercent ?? 0} />
+                        ) : null}
+                      </div>
+
+                      {(it.type == "PDF" &&  it.visited) || it.consumptionStatus == "COMPLETED" ? (
+                        <span
+                          title="Completed"
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-bold"
+                        >
+                          ✓
+                        </span>
+                      ) : (
+                        <span className="text-slate-400 h-7 w-7 mt-1">→</span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </AccordionItem>
+        );
+      })}
     </div>
   );
 }

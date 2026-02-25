@@ -1,10 +1,11 @@
 import { http } from "../lib/http";
 import type {
   ContentAccessUrlResponse,
-  ContentItem,
+  ContentItemWithConsumption,
   MyClass,
   SubjectDetailsWithModulesResponse,
   UUID,
+  VideoProgressRequest
 } from "../types/student";
 import type { StudentAnnouncementResponse,  } from "../types/announcements";
 
@@ -35,7 +36,7 @@ export const studentApi = {
     return res.data;
   },
 
-  async listModuleContent(subjectId : UUID,moduleId: UUID): Promise<ContentItem[]> {
+  async listModuleContent(subjectId : UUID,moduleId: UUID): Promise<ContentItemWithConsumption[]> {
     const res = await http.get(`student/subjects/${subjectId}/modules/${moduleId}/content-list`);
     return res.data;
   },
@@ -55,5 +56,15 @@ export const studentApi = {
   async simulatePay(req: SimulateFeePaymentRequest): Promise<SimulateFeePaymentResponse> {
     const res = await http.post<SimulateFeePaymentResponse>("/student/fees/simulate-pay", req);
     return res.data;
+  },
+
+    markVisited: async (contentId: string) => {
+    const { data } = await http.post(`/student/content/${contentId}/visited`);
+    return data;
+  },
+
+  videoProgress: async (contentId: string, body: VideoProgressRequest) => {
+    const { data } = await http.post(`/student/content/${contentId}/video-progress`, body);
+    return data;
   },
 };

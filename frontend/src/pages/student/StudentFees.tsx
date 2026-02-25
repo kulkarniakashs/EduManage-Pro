@@ -36,7 +36,8 @@ export function StudentFees() {
     if (!data) return;
     try {
       setPaying(true);
-      await studentApi.simulatePay({ feeStructureId: data.feeStructureId });
+      console.log({academicYearId: data.academicYearId, classRooomId : data.classRoomId },'dfs')
+      await studentApi.simulatePay({academicYearId: data.academicYearId, classRoomId : data.classRoomId });
       await load(); // refresh summary (should flip feeCleared on SUCCESS)
       alert("Payment simulated. Status refreshed.");
     } catch (e: any) {

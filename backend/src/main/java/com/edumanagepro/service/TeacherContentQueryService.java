@@ -53,7 +53,7 @@ public class TeacherContentQueryService {
             throw new RuntimeException("Not allowed");
         }
 
-        return contentItemRepository.findByModuleId(moduleId)
+        return contentItemRepository.findByModuleIdOrderByCreatedAt(moduleId)
                 .stream()
                 .map(this::toContentDto)
                 .toList();

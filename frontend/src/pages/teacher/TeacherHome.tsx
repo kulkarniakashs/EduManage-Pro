@@ -84,7 +84,7 @@ export function TeacherHome() {
         </div>
       </div>
 
-      <div className="mt-5 grid grid-cols-2">
+      <div className="mt-5 grid grid-cols-2 gap-3">
         {loading ? (
           <>
             <Skeleton className="h-60" />

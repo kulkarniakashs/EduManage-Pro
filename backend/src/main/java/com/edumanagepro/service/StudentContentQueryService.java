@@ -1,20 +1,18 @@
 package com.edumanagepro.service;
 
 import com.edumanagepro.dto.response.*;
-import com.edumanagepro.entity.Enrollment;
+import com.edumanagepro.entity.*;
 import com.edumanagepro.entity.Module;
-import com.edumanagepro.entity.Subject;
 import com.edumanagepro.entity.enums.EnrollmentStatus;
-import com.edumanagepro.repository.ContentItemRepository;
-import com.edumanagepro.repository.EnrollmentRepository;
-import com.edumanagepro.repository.ModuleRepository;
-import com.edumanagepro.repository.SubjectRepository;
+import com.edumanagepro.repository.*;
 import com.edumanagepro.security.AccessValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +23,7 @@ public class StudentContentQueryService {
     private final ContentItemRepository contentItemRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final SubjectRepository subjectRepository;
+    private final ContentConsumptionRepository contentConsumptionRepository;
 
     public StudentMyClassResponse getMyClassAndSubjects(UUID studentId) {
 
@@ -64,7 +63,7 @@ public class StudentContentQueryService {
         return  new SubjectDetailsWithModulesResponse(sub.getId(),sub.getName(), sub.getDescription(), sub.getThumbnailUrl(), sub.getTeacher().getId(), sub.getTeacher().getFullName(), sub.getTeacher().getProfilePhotoKey(),  moduleResponses);
     }
 
-    public List<ContentItemResponse> listPublishedContent(UUID studentId, UUID subjectId, UUID moduleId) {
+    public List<ContentItemWithConsumptionResponse> listPublishedContent(UUID studentId, UUID subjectId, UUID moduleId) {
         accessValidator.validateStudentContentAccess(studentId, subjectId);
 
         // module must belong to subject
@@ -74,9 +73,32 @@ public class StudentContentQueryService {
         }
 
         // only published items
-        return contentItemRepository.findByModuleIdAndIsPublishedTrue(moduleId)
-                .stream()
-                .map(ContentItemResponse::toContentItemResponse)
+//        return contentItemRepository.findByModuleIdAndIsPublishedTrue(moduleId)
+//                .stream()
+//                .map(contentItem -> {
+//                    ContentConsumption cc = contentConsumptionRepository.findByStudentIdAndContentItemId(studentId, contentItem.getId()).orElseThrow(err -> {});
+//                    return ContentItemWithConsumptionResponse.toContentItem(contentItem, cc);
+//                })
+//                .toList();
+        var items = contentItemRepository.findByModuleIdAndIsPublishedTrueOrderByCreatedAt(moduleId);
+
+        var itemIds = items.stream()
+                .map(ContentItem::getId)
+                .toList();
+
+        var consumptions = contentConsumptionRepository.findByStudentIdAndContentItemIdIn(studentId, itemIds);
+
+        var ccMap = consumptions.stream()
+                .collect(Collectors.toMap(
+                        cc -> cc.getContentItem().getId(),
+                        Function.identity()
+                ));
+
+        return items.stream()
+                .map(ci -> {
+                    var cc = ccMap.get(ci.getId()); // can be null if not started
+                    return ContentItemWithConsumptionResponse.toContentItem(ci, cc);
+                })
                 .toList();
     }
 

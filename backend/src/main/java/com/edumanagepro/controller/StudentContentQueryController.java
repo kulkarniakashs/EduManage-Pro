@@ -1,9 +1,6 @@
 package com.edumanagepro.controller;
 
-import com.edumanagepro.dto.response.ContentItemResponse;
-import com.edumanagepro.dto.response.ModuleResponse;
-import com.edumanagepro.dto.response.StudentMyClassResponse;
-import com.edumanagepro.dto.response.SubjectDetailsWithModulesResponse;
+import com.edumanagepro.dto.response.*;
 import com.edumanagepro.security.UserPrincipal;
 import com.edumanagepro.service.StudentContentQueryService;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +42,7 @@ public class StudentContentQueryController {
 
     // GET /student/subjects/{subjectId}/modules/{moduleId}/content-list
     @GetMapping("/subjects/{subjectId}/modules/{moduleId}/content-list")
-    public List<ContentItemResponse> listContent(
+    public List<ContentItemWithConsumptionResponse> listContent(
             @AuthenticationPrincipal UserPrincipal me,
             @PathVariable UUID subjectId,
             @PathVariable UUID moduleId

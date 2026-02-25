@@ -11,7 +11,6 @@ import { StudentFees } from "./pages/student/StudentFees";
 import LoginPage from "./pages/Login";
 import ProfilePage from "./pages/ProfilePage";
 import { VideoPlayer } from "./pages/VideoPlayer";
-import { studentApi } from "./api/studentApi";
 import { teacherApi } from "./api/teacherApi";
 import { AdminHome } from "./pages/admin/AdminHome";
 import { AdminClassDetail } from "./pages/admin/AdminClassDetails";
@@ -20,6 +19,7 @@ import { AdminCreateUsersPage } from "./pages/admin/AdminCreateUserPage";
 import { TeacherAttendanceHome } from "./pages/teacher/TeacherAttendanceHome";
 import { TeacherAttendanceSubject } from "./pages/teacher/TeacherAttendanceSubject";
 import { StudentAttendancePage } from "./pages/student/StudentAttendancePage";
+import { StudentVideoPlayer } from "./pages/student/StudentPlayer";
 
 export default function App() {
   return (
@@ -32,12 +32,16 @@ export default function App() {
           <Route path="subject/:subjectId" element={<StudentSubject />} />
           <Route path="announcements" element={<StudentAnnouncements />} />
           <Route path="profile" element={<ProfilePage />} />
-          <Route
+          {/* <Route
             path="player/:kind/:contentId"
             element={<VideoPlayer contentItemUrl={studentApi.contentItemUrl} />}
+          /> */}
+          <Route
+            path="player/:kind/:contentId"
+            element={<StudentVideoPlayer/>}
           />
           <Route path="fees" element={<StudentFees />}></Route>
-          <Route path="attendance" element={<StudentAttendancePage/>} />
+          <Route path="attendance" element={<StudentAttendancePage />} />
         </Route>
 
         <Route path="/teacher" element={<TeacherLayout />}>
@@ -48,8 +52,11 @@ export default function App() {
             element={<VideoPlayer contentItemUrl={teacherApi.contentItemUrl} />}
           />
           <Route path="profile" element={<ProfilePage />} />
-          <Route path="attendance" element={<TeacherAttendanceHome/>}/>
-          <Route path="attendance/:subjectId" element={<TeacherAttendanceSubject/>} />
+          <Route path="attendance" element={<TeacherAttendanceHome />} />
+          <Route
+            path="attendance/:subjectId"
+            element={<TeacherAttendanceSubject />}
+          />
         </Route>
 
         <Route path="/admin" element={<AdminLayout />}>
@@ -58,7 +65,7 @@ export default function App() {
             path="class/:academicYearId/:classRoomId"
             element={<AdminClassDetail />}
           />
-          <Route path="users" element={<AdminCreateUsersPage/>} />
+          <Route path="users" element={<AdminCreateUsersPage />} />
           <Route path="profile" element={<ProfilePage />} />
         </Route>
         {/* <Route path="*" element={<Navigate to="/student" replace />} /> */}

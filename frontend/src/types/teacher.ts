@@ -39,6 +39,7 @@ export type InitContentUploadRequest = {
   description?: string;
   type: ContentType;
   contentType: string; // "video/mp4" / "application/pdf"
+  duration : number;
   published: boolean;
   protectedContent: boolean;
 };
