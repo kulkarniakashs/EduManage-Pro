@@ -28,7 +28,7 @@ export function TeacherSidebar() {
         <div className="flex flex-col justify-between h-full">
           <div>
             <div className="h-fit w-full flex justify-center">
-              <img className="h-20 w-[80%] object-contain" src="./logo.png" alt="logo"></img>
+              <img className="h-20 w-[80%] object-contain" src="/logo.png" alt="logo"></img>
             </div>
 
             <div className="mt-4 space-y-1">

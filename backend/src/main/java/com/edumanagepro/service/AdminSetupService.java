@@ -8,6 +8,8 @@ import com.edumanagepro.security.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.edumanagepro.events.*;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -25,6 +27,7 @@ public class AdminSetupService {
     private final FeeStructureRepository feeStructureRepository;
     private final AnnouncementRepository announcementRepository; // you added earlier
     private final PasswordEncoder passwordEncoder;
+    private final ApplicationEventPublisher events;
 
     public AcademicYear createAcademicYear(CreateAcademicYearRequest req) {
         Institute inst = instituteRepository.findById(req.getInstituteId()).orElseThrow();
@@ -69,8 +72,9 @@ public class AdminSetupService {
         u.setPasswordHash(passwordEncoder.encode(req.getPassword()));
         u.setRole(req.getRole());
         u.setActive(true);
-
-        return userRepository.save(u);
+        User saved = userRepository.save(u);
+        events.publishEvent(new UserCreatedEvent(saved.getId(), req.getPassword()));
+        return saved;
     }
 
     public Subject createSubject(CreateSubjectRequest req) {
@@ -88,8 +92,9 @@ public class AdminSetupService {
         s.setDescription(req.getDescription());
         s.setThumbnailUrl(req.getThumbnailUrl()); // optional
         s.setIsActive(true);
-
-        return subjectRepository.save(s);
+        Subject saved = subjectRepository.save(s);
+        events.publishEvent(new TeacherAssignedEvent(saved.getId()));
+        return saved;
     }
 
     public Subject assignTeacherToSubject(java.util.UUID subjectId, AssignTeacherRequest req) {
@@ -99,7 +104,9 @@ public class AdminSetupService {
         if (teacher.getRole() != UserRole.TEACHER) throw new RuntimeException("Assigned user is not a TEACHER");
 
         s.setTeacher(teacher);
-        return subjectRepository.save(s);
+        Subject saved = subjectRepository.save(s);
+        events.publishEvent(new TeacherAssignedEvent(saved.getId()));
+        return saved;
     }
 
     public Enrollment enrollStudent(CreateEnrollmentRequest req) {
@@ -124,8 +131,9 @@ public class AdminSetupService {
         e.setStatus(EnrollmentStatus.ACTIVE);
         e.setEnrolledAt(Instant.now());
         e.setFeeCleared(false);
-
-        return enrollmentRepository.save(e);
+        Enrollment enr = enrollmentRepository.save(e);
+        events.publishEvent(new StudentEnrolledEvent(enr.getId()));
+        return enr;
     }
 
     public FeeStructure setFeeStructure(CreateFeeStructureRequest req) {
