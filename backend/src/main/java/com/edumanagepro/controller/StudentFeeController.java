@@ -1,9 +1,10 @@
-
 package com.edumanagepro.controller;
 
-import com.edumanagepro.dto.request.SimulateFeePaymentRequest;
-import com.edumanagepro.dto.response.SimulateFeePaymentResponse;
+import com.edumanagepro.dto.request.CreateRazorpayOrderRequest;
+import com.edumanagepro.dto.request.VerifyRazorpayPaymentRequest;
+import com.edumanagepro.dto.response.CreateRazorpayOrderResponse;
 import com.edumanagepro.dto.response.StudentFeeSummaryResponse;
+import com.edumanagepro.dto.response.VerifyRazorpayPaymentResponse;
 import com.edumanagepro.security.UserPrincipal;
 import com.edumanagepro.service.FeePaymentService;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +23,21 @@ public class StudentFeeController {
         return feePaymentService.getSummary(me.getId());
     }
 
-    @PostMapping("/simulate-pay")
-    public SimulateFeePaymentResponse simulatePay(
+    // 1) Create order (server computes amount from FeeStructure)
+    @PostMapping("/razorpay/order")
+    public CreateRazorpayOrderResponse createOrder(
             @AuthenticationPrincipal UserPrincipal me,
-            @RequestBody SimulateFeePaymentRequest req
+            @RequestBody CreateRazorpayOrderRequest req
     ) {
-        return feePaymentService.simulatePay(me.getId(), req);
+        return feePaymentService.createRazorpayOrder(me.getId(), req);
+    }
+
+    // 2) Verify payment signature and mark SUCCESS
+    @PostMapping("/razorpay/verify")
+    public VerifyRazorpayPaymentResponse verifyPayment(
+            @AuthenticationPrincipal UserPrincipal me,
+            @RequestBody VerifyRazorpayPaymentRequest req
+    ) {
+        return feePaymentService.verifyRazorpayPayment(me.getId(), req);
     }
 }

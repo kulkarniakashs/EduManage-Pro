@@ -5,22 +5,27 @@ import type {
   MyClass,
   SubjectDetailsWithModulesResponse,
   UUID,
-  VideoProgressRequest
+  VideoProgressRequest,
 } from "../types/student";
-import type { StudentAnnouncementResponse,  } from "../types/announcements";
+import type { StudentAnnouncementResponse } from "../types/announcements";
 
-import type { StudentFeeSummaryResponse, SimulateFeePaymentRequest, SimulateFeePaymentResponse } from "../types/fees";
-
+import type {
+  StudentFeeSummaryResponse,
+  SimulateFeePaymentRequest,
+  SimulateFeePaymentResponse,
+} from "../types/fees";
 
 export const studentApi = {
   async listSubjects(): Promise<MyClass> {
-    const res = await http.get('/student/me/class')
+    const res = await http.get("/student/me/class");
     console.log(res.data);
     return res.data;
   },
 
-  async getSubject(subjectId: UUID): Promise<SubjectDetailsWithModulesResponse> {
-    const res = await http.get(`/student/subjects/${subjectId}`)
+  async getSubject(
+    subjectId: UUID,
+  ): Promise<SubjectDetailsWithModulesResponse> {
+    const res = await http.get(`/student/subjects/${subjectId}`);
     console.log(res.data);
     return res.data;
   },
@@ -31,40 +36,67 @@ export const studentApi = {
   // },
 
   async listAnnouncements(): Promise<StudentAnnouncementResponse[]> {
-    const res = await http.get<StudentAnnouncementResponse[]>("/student/announcements");
+    const res = await http.get<StudentAnnouncementResponse[]>(
+      "/student/announcements",
+    );
     console.log(res.data);
     return res.data;
   },
 
-  async listModuleContent(subjectId : UUID,moduleId: UUID): Promise<ContentItemWithConsumption[]> {
-    const res = await http.get(`student/subjects/${subjectId}/modules/${moduleId}/content-list`);
+  async listModuleContent(
+    subjectId: UUID,
+    moduleId: UUID,
+  ): Promise<ContentItemWithConsumption[]> {
+    const res = await http.get(
+      `student/subjects/${subjectId}/modules/${moduleId}/content-list`,
+    );
     return res.data;
   },
 
-
-  async contentItemUrl(contentId : UUID) : Promise<ContentAccessUrlResponse>{
+  async contentItemUrl(contentId: UUID): Promise<ContentAccessUrlResponse> {
     const res = await http.get(`student/content-items/${contentId}/access-url`);
     console.log(res.data);
     return res.data;
   },
 
   async getFeeSummary(): Promise<StudentFeeSummaryResponse> {
-    const res = await http.get<StudentFeeSummaryResponse>("/student/fees/summary");
+    const res = await http.get<StudentFeeSummaryResponse>(
+      "/student/fees/summary",
+    );
     return res.data;
   },
 
-  async simulatePay(req: SimulateFeePaymentRequest): Promise<SimulateFeePaymentResponse> {
-    const res = await http.post<SimulateFeePaymentResponse>("/student/fees/simulate-pay", req);
+  async simulatePay(
+    req: SimulateFeePaymentRequest,
+  ): Promise<SimulateFeePaymentResponse> {
+    const res = await http.post<SimulateFeePaymentResponse>(
+      "/student/fees/simulate-pay",
+      req,
+    );
     return res.data;
   },
 
-    markVisited: async (contentId: string) => {
+  markVisited: async (contentId: string) => {
     const { data } = await http.post(`/student/content/${contentId}/visited`);
     return data;
   },
 
   videoProgress: async (contentId: string, body: VideoProgressRequest) => {
-    const { data } = await http.post(`/student/content/${contentId}/video-progress`, body);
+    const { data } = await http.post(
+      `/student/content/${contentId}/video-progress`,
+      body,
+    );
     return data;
   },
+
+  createRazorpayOrder: (payload: {
+    academicYearId: string;
+    classRoomId: string;
+  }) => http.post("/student/fees/razorpay/order", payload).then((r) => r.data),
+
+  verifyRazorpayPayment: (payload: {
+    razorpayOrderId: string;
+    razorpayPaymentId: string;
+    razorpaySignature: string;
+  }) => http.post("/student/fees/razorpay/verify", payload).then((r) => r.data),
 };

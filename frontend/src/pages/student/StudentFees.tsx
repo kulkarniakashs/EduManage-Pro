@@ -5,8 +5,26 @@ import { Card } from "../../components/student/Card";
 import { Skeleton } from "../../components/Skeleton";
 import { EmptyState } from "../../components/EmptyState";
 
+declare global {
+  interface Window {
+    Razorpay?: any;
+  }
+}
+
 function money(amount: string, currency: string) {
   return `${currency} ${amount}`;
+}
+
+function loadRazorpayScript(): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (window.Razorpay) return resolve(true);
+
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
 }
 
 export function StudentFees() {
@@ -32,14 +50,54 @@ export function StudentFees() {
     load();
   }, []);
 
-  const simulatePay = async () => {
+  const payNow = async () => {
     if (!data) return;
+
     try {
       setPaying(true);
-      console.log({academicYearId: data.academicYearId, classRooomId : data.classRoomId },'dfs')
-      await studentApi.simulatePay({academicYearId: data.academicYearId, classRoomId : data.classRoomId });
-      await load(); // refresh summary (should flip feeCleared on SUCCESS)
-      alert("Payment simulated. Status refreshed.");
+
+      const ok = await loadRazorpayScript();
+      if (!ok) {
+        alert("Failed to load Razorpay Checkout. Please check your internet and try again.");
+        return;
+      }
+
+      // 1) Create order from backend (amount computed server-side)
+      const orderRes = await studentApi.createRazorpayOrder({
+        academicYearId: data.academicYearId,
+        classRoomId: data.classRoomId,
+      });
+
+      const options = {
+        key: orderRes.razorpayKeyId,
+        name: "EduManage Pro",
+        description: `Fees for ${data.classRoomName} (${data.academicYearName})`,
+        currency: orderRes.currency,
+        amount: Math.round(Number(orderRes.amount) * 100), // Razorpay expects subunits
+        order_id: orderRes.razorpayOrderId,
+        handler: async (response: any) => {
+          try {
+            // 2) Verify payment (signature) on backend
+            await studentApi.verifyRazorpayPayment({
+              razorpayOrderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+            });
+
+            await load(); // refresh summary; should unlock content
+            alert("Payment successful. Access unlocked.");
+          } catch (e: any) {
+            alert(e?.response?.data?.message || e?.message || "Payment verification failed");
+          }
+        },
+        theme: { color: "#0f172a" }, // same “slate-900” vibe
+        modal: {
+          ondismiss: () => setPaying(false),
+        },
+      };
+
+      const rz = new window.Razorpay(options);
+      rz.open();
     } catch (e: any) {
       alert(e?.response?.data?.message || e?.message || "Payment failed");
     } finally {
@@ -110,26 +168,19 @@ export function StudentFees() {
             <div className="text-xs text-slate-500">Academic Year</div>
             <div className="mt-1 font-semibold text-slate-900">{data.academicYearName}</div>
           </div>
-
-          {/* <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <div className="text-xs text-slate-500">Fee Structure</div>
-            <div className="mt-1 font-semibold text-slate-900 break-all">
-              {data.fee}
-            </div>
-          </div> */}
         </div>
 
         <div className="mt-5 flex flex-wrap gap-2">
           <button
             disabled={!locked || paying}
-            onClick={simulatePay}
+            onClick={payNow}
             className={[
               "inline-flex items-center justify-center rounded-2xl px-4 py-2 text-sm font-semibold transition",
               locked ? "bg-slate-900 text-white hover:bg-slate-800" : "bg-slate-200 text-slate-600 cursor-not-allowed",
               paying ? "opacity-70" : "",
             ].join(" ")}
           >
-            {paying ? "Processing..." : "Pay Now (Simulated)"}
+            {paying ? "Processing..." : "Pay Now"}
           </button>
 
           <button
