@@ -15,4 +15,6 @@ public interface ContentItemRepository extends JpaRepository<ContentItem, UUID> 
     List<ContentItem> findByModuleIdAndIsPublishedTrueOrderByCreatedAt(UUID moduleId);
 
     List<ContentItem> findByModuleIdOrderByCreatedAt(UUID moduleId);
+
+    long countByModuleId(UUID moduleId);
 }

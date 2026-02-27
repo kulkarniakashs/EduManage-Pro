@@ -14,6 +14,7 @@ export type Module = {
   title: string;
   description?: string | null;
   createdAt: string;
+  count : number;
 };
 
 export type ContentItem = {

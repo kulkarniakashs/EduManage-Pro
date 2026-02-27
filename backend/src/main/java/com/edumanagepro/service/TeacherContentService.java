@@ -5,6 +5,8 @@ import com.edumanagepro.dto.response.ConfirmUploadResponse;
 import com.edumanagepro.dto.response.ContentItemResponse;
 import com.edumanagepro.dto.response.InitContentUploadResponse;
 import com.edumanagepro.dto.response.ModuleResponse;
+import com.edumanagepro.dto.response.DeleteContentItemResponse;
+import com.edumanagepro.dto.response.DeleteModuleResponse;
 import com.edumanagepro.entity.*;
 import com.edumanagepro.entity.Module;
 import com.edumanagepro.entity.enums.ContentType;
@@ -15,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -103,6 +106,67 @@ public class TeacherContentService {
         ContentItem saved = contentItemRepository.save(ci);
 
         return new ConfirmUploadResponse(toDto(saved));
+    }
+
+    //Delete content
+    @Transactional
+    public DeleteContentItemResponse deleteContentItem(UUID teacherId, UUID contentItemId) {
+        ContentItem it = contentItemRepository.findById(contentItemId).orElseThrow();
+
+        // ✅ teacher must own subject
+        UUID ownerId = it.getModule().getSubject().getTeacher().getId();
+        if (!ownerId.equals(teacherId)) throw new RuntimeException("Not allowed");
+
+        boolean deletedObj = false;
+
+        // delete R2 object if VIDEO/PDF
+        if ((it.getType() == ContentType.VIDEO || it.getType() == ContentType.PDF)
+                && it.getObjectKey() != null && !it.getObjectKey().isBlank()) {
+            r2.deleteObjectIfPresent(it.getObjectKey());
+            deletedObj = true;
+        }
+
+        contentItemRepository.delete(it);
+
+        return new DeleteContentItemResponse(true, deletedObj);
+    }
+
+    @Transactional
+    public DeleteModuleResponse deleteModule(UUID teacherId, UUID moduleId, boolean deleteAllContent) {
+        Module m = moduleRepository.findById(moduleId).orElseThrow();
+
+        // ✅ teacher must own subject
+        UUID ownerId = m.getSubject().getTeacher().getId();
+        if (!ownerId.equals(teacherId)) throw new RuntimeException("Not allowed");
+
+        long count = contentItemRepository.countByModuleId(moduleId);
+        if (count > 0 && !deleteAllContent) {
+            throw new RuntimeException("Module has content items. Pass deleteAllContent=true to delete everything.");
+        }
+
+        int deletedContent = 0;
+        int deletedObjects = 0;
+
+        if (count > 0) {
+            List<ContentItem> items = contentItemRepository.findByModuleId(moduleId);
+
+            // delete R2 objects first
+            for (ContentItem it : items) {
+                if ((it.getType() == ContentType.VIDEO || it.getType() == ContentType.PDF)) {
+                    if (it.getObjectKey() != null && !it.getObjectKey().isBlank()) {
+                        r2.deleteObjectIfPresent(it.getObjectKey());
+                        deletedObjects++;
+                    }
+                }
+            }
+
+            contentItemRepository.deleteAll(items);
+            deletedContent = items.size();
+        }
+
+        moduleRepository.delete(m);
+
+        return new DeleteModuleResponse(true, deletedContent, deletedObjects);
     }
 
     private ContentItemResponse toDto(ContentItem c) {

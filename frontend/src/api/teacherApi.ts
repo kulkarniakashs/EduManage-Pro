@@ -20,49 +20,84 @@ export const teacherApi = {
   },
 
   async listModules(subjectId: UUID): Promise<Module[]> {
-    const res = await http.get<Module[]>(`/teacher/subjects/${subjectId}/modules`);
+    const res = await http.get<Module[]>(
+      `/teacher/subjects/${subjectId}/modules`,
+    );
     return res.data;
   },
 
-  async createModule(subjectId: UUID, req: CreateModuleRequest): Promise<Module> {
-    const res = await http.post<Module>(`/teacher/subjects/${subjectId}/modules`, req);
+  async createModule(
+    subjectId: UUID,
+    req: CreateModuleRequest,
+  ): Promise<Module> {
+    const res = await http.post<Module>(
+      `/teacher/subjects/${subjectId}/modules`,
+      req,
+    );
     return res.data;
   },
 
   async listModuleContent(moduleId: UUID): Promise<ContentItem[]> {
-    const res = await http.get<ContentItem[]>(`/teacher/modules/${moduleId}/content-items`);
+    const res = await http.get<ContentItem[]>(
+      `/teacher/modules/${moduleId}/content-items`,
+    );
     return res.data;
   },
 
-  async initUpload(moduleId: UUID, req: InitContentUploadRequest): Promise<InitContentUploadResponse> {
+  async initUpload(
+    moduleId: UUID,
+    req: InitContentUploadRequest,
+  ): Promise<InitContentUploadResponse> {
     const res = await http.post<InitContentUploadResponse>(
       `/teacher/modules/${moduleId}/content-items/init-upload`,
-      req
+      req,
     );
     return res.data;
   },
 
   async confirmUpload(contentItemId: UUID): Promise<ConfirmUploadResponse> {
     const res = await http.put<ConfirmUploadResponse>(
-      `/teacher/content-items/${contentItemId}/confirm-upload`
+      `/teacher/content-items/${contentItemId}/confirm-upload`,
     );
     return res.data;
   },
 
-  async presignSubjectThumbnail(subjectId: UUID, contentType: string): Promise<PresignUploadResponse> {
+  async presignSubjectThumbnail(
+    subjectId: UUID,
+    contentType: string,
+  ): Promise<PresignUploadResponse> {
     const res = await http.post<PresignUploadResponse>(
-      `/teacher/subjects/${subjectId}/thumbnail/presign?contentType=${encodeURIComponent(contentType)}`
+      `/teacher/subjects/${subjectId}/thumbnail/presign?contentType=${encodeURIComponent(contentType)}`,
     );
     return res.data;
   },
 
-  async confirmSubjectThumbnail(subjectId: UUID, req: ConfirmObjectKeyRequest): Promise<void> {
+  async confirmSubjectThumbnail(
+    subjectId: UUID,
+    req: ConfirmObjectKeyRequest,
+  ): Promise<void> {
     await http.put(`/teacher/subjects/${subjectId}/thumbnail`, req);
   },
 
-    async contentItemUrl(contentId : UUID) : Promise<ContentAccessUrlResponse>{
-      const res = await http.get(`teacher/content-item/${contentId}`);
-      console.log(res.data);
-      return res.data;
-    },
+  async contentItemUrl(contentId: UUID): Promise<ContentAccessUrlResponse> {
+    const res = await http.get(`teacher/content-item/${contentId}`);
+    console.log(res.data);
+    return res.data;
+  },
+
+  async deleteContentItem(contentItemId: string) {
+    const res = await http.delete(`/teacher/content-items/${contentItemId}`);
+    return res.data as { deleted: boolean; deletedObject: boolean };
+  },
+
+  async deleteModule(moduleId: string, deleteAllContent: boolean) {
+    const res = await http.delete(
+      `/teacher/modules/${moduleId}?deleteAllContent=${deleteAllContent ? "true" : "false"}`,
+    );
+    return res.data as {
+      deleted: boolean;
+      deletedContentItems: number;
+      deletedObjects: number;
+    };
+  },
 };

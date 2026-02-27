@@ -10,7 +10,6 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 public class ModuleResponse {
-
     private UUID id;
     private String title;
     private String description;

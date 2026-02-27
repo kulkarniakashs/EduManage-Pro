@@ -8,6 +8,7 @@ import { Skeleton } from "../../components/Skeleton";
 import { EmptyState } from "../../components/EmptyState";
 import { AccordionItem } from "../../components/Accordion";
 import { Badge } from "../../components/Badge";
+import { ConfirmModal } from "../../components/teacher/ConfrimModal";
 
 function colorFromId(id: string) {
   const colors = [
@@ -54,6 +55,30 @@ export function TeacherSubject() {
   const [uploadOpen, setUploadOpen] = useState(false);
 
   const fallback = useMemo(() => colorFromId(subjectId), [subjectId]);
+
+  // inside TeacherSubject component:
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmTitle, setConfirmTitle] = useState("");
+  const [confirmDesc, setConfirmDesc] = useState<string | undefined>(undefined);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+
+  const [deleteAllContent, setDeleteAllContent] = useState(true); // for module delete checkbox
+  const confirmActionRef = useRef<null | (() => Promise<void>)>(null);
+
+  function openConfirm(
+    title: string,
+    desc: string,
+    action: () => Promise<void>,
+    opts?: { showDeleteAllToggle?: boolean; defaultDeleteAll?: boolean },
+  ) {
+    setConfirmTitle(title);
+    setConfirmDesc(desc);
+    confirmActionRef.current = action;
+    if (opts?.showDeleteAllToggle) {
+      setDeleteAllContent(opts.defaultDeleteAll ?? true);
+    }
+    setConfirmOpen(true);
+  }
 
   const load = async () => {
     try {
@@ -278,15 +303,60 @@ export function TeacherSubject() {
                     <div className="text-sm text-slate-600">
                       Upload videos / PDFs for this module.
                     </div>
-                    <button
-                      onClick={() => {
-                        setActiveModuleId(m.id);
-                        setUploadOpen(true);
-                      }}
-                      className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50"
-                    >
-                      + Upload Content
-                    </button>
+                    <div className="flex gap-1.5">
+                      <button
+                        onClick={() => {
+                          setActiveModuleId(m.id);
+                          setUploadOpen(true);
+                        }}
+                        className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50"
+                      >
+                        + Upload Content
+                      </button>
+                      <button
+                        className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50"
+                        onClick={() => {
+                          const hasItems =
+                            (contentByModule[m.id]?.length ?? 0) > 0;
+
+                          openConfirm(
+                            "Delete module?",
+                            hasItems
+                              ? "This module contains content items. Choose whether to delete them too."
+                              : "This will delete the module.",
+                            async () => {
+                              try {
+                                setConfirmLoading(true);
+                                await teacherApi.deleteModule(
+                                  m.id,
+                                  hasItems ? deleteAllContent : false,
+                                );
+
+                                // update UI locally
+                                setModules((prev) =>
+                                  prev.filter((x) => x.id !== m.id),
+                                );
+                                setContentByModule((prev) => {
+                                  const copy = { ...prev };
+                                  delete copy[m.id];
+                                  return copy;
+                                });
+                              } finally {
+                                setConfirmLoading(false);
+                                setConfirmOpen(false);
+                              }
+                            },
+                            {
+                              showDeleteAllToggle: hasItems,
+                              defaultDeleteAll: true,
+                            },
+                          );
+                        }}
+                        title="Delete module"
+                      >
+                        🗑️
+                      </button>
+                    </div>
                   </div>
 
                   {isLoading ? (
@@ -313,7 +383,7 @@ export function TeacherSubject() {
                             }
                           }}
                           key={it.id}
-                          className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-3 hover:cursor-pointer"
+                          className="flex items-center gap-4 rounded-xl border border-slate-200 bg-white px-3 py-3 hover:cursor-pointer"
                         >
                           <ContentIcon type={it.type} />
                           <div className="min-w-0 flex-1">
@@ -326,9 +396,36 @@ export function TeacherSubject() {
                               {it.protectedContent ? "Paid" : "Free"}
                             </div>
                           </div>
-                          <span className="text-xs rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-slate-700">
-                            {it.uploadStatus ? "READY" : "UPLOADING"}
-                          </span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openConfirm(
+                                "Delete content item?",
+                                "This will remove the item and delete its file from storage (for PDF/VIDEO).",
+                                async () => {
+                                  try {
+                                    setConfirmLoading(true);
+                                    await teacherApi.deleteContentItem(it.id);
+
+                                    // update UI locally
+                                    setContentByModule((prev) => ({
+                                      ...prev,
+                                      [m.id]: (prev[m.id] ?? []).filter(
+                                        (x) => x.id !== it.id,
+                                      ),
+                                    }));
+                                  } finally {
+                                    setConfirmLoading(false);
+                                    setConfirmOpen(false);
+                                  }
+                                },
+                              );
+                            }}
+                            className="rounded-xl border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                            title="Delete content"
+                          >
+                            🗑️
+                          </button>
                         </div>
                       ))}
                     </div>
@@ -345,10 +442,35 @@ export function TeacherSubject() {
         moduleId={activeModuleId}
         onClose={() => setUploadOpen(false)}
         onUploaded={async (moduleId, _newItem) => {
-          // refresh content list for that module
-          // const items = await teacherApi.listModuleContent(moduleId);
-          setContentByModule((p) => ({ ...p, [moduleId]: [...p[moduleId],_newItem]}));
+          setContentByModule((p) => ({
+            ...p,
+            [moduleId]: [...p[moduleId], _newItem],
+          }));
         }}
+      />
+      <ConfirmModal
+        open={confirmOpen}
+        title={confirmTitle}
+        description={confirmDesc}
+        loading={confirmLoading}
+        confirmText="Delete"
+        onClose={() => (confirmLoading ? null : setConfirmOpen(false))}
+        onConfirm={() => {
+          const fn = confirmActionRef.current;
+          if (fn) fn();
+        }}
+        extra={
+          confirmTitle === "Delete module?" ? (
+            <label className="flex items-center gap-2 text-sm text-slate-700">
+              <input
+                type="checkbox"
+                checked={deleteAllContent}
+                onChange={(e) => setDeleteAllContent(e.target.checked)}
+              />
+              Delete all content items in this module too
+            </label>
+          ) : null
+        }
       />
     </div>
   );

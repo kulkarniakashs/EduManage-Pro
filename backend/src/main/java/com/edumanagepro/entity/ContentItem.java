@@ -6,6 +6,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "content_items",
         indexes = {
@@ -40,6 +43,9 @@ public class ContentItem extends BaseEntity {
     private boolean isPublished = true;
 
     private boolean uploadStatus = false;
+
+    @OneToMany(mappedBy = "contentItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ContentConsumption> consumptions = new ArrayList<>();
 
     public boolean getUploadStatus() {
         return uploadStatus;
