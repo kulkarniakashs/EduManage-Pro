@@ -11,6 +11,7 @@ import type {
   CreateClassRoomRequest,
   CreateFeeStructureRequest,
   CreateSubjectRequest,
+  AdminAnnouncement
 } from "../types/admin";
 
 export const adminApi = {
@@ -24,19 +25,31 @@ export const adminApi = {
     return res.data;
   },
   async listClassRooms(academicYearId: string): Promise<AdminClassRoom[]> {
-    const res = await http.get(`/admin/academic-years/${academicYearId}/classrooms`);
+    const res = await http.get(
+      `/admin/academic-years/${academicYearId}/classrooms`,
+    );
     return res.data;
   },
-  async listSubjects(academicYearId: string, classRoomId: string): Promise<AdminSubjectWithTeacher[]> {
-    const res = await http.get(`/admin/academic-years/${academicYearId}/classrooms/${classRoomId}/subjects`);
+  async listSubjects(
+    academicYearId: string,
+    classRoomId: string,
+  ): Promise<AdminSubjectWithTeacher[]> {
+    const res = await http.get(
+      `/admin/academic-years/${academicYearId}/classrooms/${classRoomId}/subjects`,
+    );
     return res.data;
   },
   async listTeachers(): Promise<AdminTeacherOption[]> {
     const res = await http.get("/admin/teachers");
     return res.data;
   },
-  async getFeeStructure(academicYearId: string, classRoomId: string): Promise<AdminFeeStructure> {
-    const res = await http.get(`/admin/fee-structures?academicYearId=${academicYearId}&classRoomId=${classRoomId}`);
+  async getFeeStructure(
+    academicYearId: string,
+    classRoomId: string,
+  ): Promise<AdminFeeStructure> {
+    const res = await http.get(
+      `/admin/fee-structures?academicYearId=${academicYearId}&classRoomId=${classRoomId}`,
+    );
     return res.data;
   },
 
@@ -54,7 +67,10 @@ export const adminApi = {
     return res.data;
   },
   async assignTeacher(subjectId: string, req: AssignTeacherRequest) {
-    const res = await http.put(`/admin/subjects/${subjectId}/assign-teacher`, req);
+    const res = await http.put(
+      `/admin/subjects/${subjectId}/assign-teacher`,
+      req,
+    );
     return res.data;
   },
   async setFeeStructure(req: CreateFeeStructureRequest) {
@@ -63,14 +79,42 @@ export const adminApi = {
   },
 
   //Enrollment
-    async listAvailableStudents(academicYearId: string, classRoomId: string): Promise<AdminStudentOption[]> {
+  async listAvailableStudents(
+    academicYearId: string,
+    classRoomId: string,
+  ): Promise<AdminStudentOption[]> {
     const res = await http.get(
-      `/admin/students/available?academicYearId=${academicYearId}&classRoomId=${classRoomId}`
+      `/admin/students/available?academicYearId=${academicYearId}&classRoomId=${classRoomId}`,
     );
     return res.data;
   },
 
-  async enrollStudent(req: { academicYearId: string; classRoomId: string; studentId: string }): Promise<void> {
+  async enrollStudent(req: {
+    academicYearId: string;
+    classRoomId: string;
+    studentId: string;
+  }): Promise<void> {
     await http.post("/admin/enrollments", req);
+  },
+
+  //Announcements
+  async listAnnouncements(
+    academicYearId: string,
+    classRoomId: string,
+  ): Promise<AdminAnnouncement[]> {
+    const res = await http.get(
+      `/admin/announcements?academicYearId=${academicYearId}&classRoomId=${classRoomId}`,
+    );
+    return res.data;
+  },
+
+  async createAnnouncement(req: {
+    academicYearId: string;
+    classRoomId: string;
+    title: string;
+    message: string;
+  }) {
+    const res = await http.post("/admin/announcements", req);
+    return res.data;
   },
 };

@@ -34,6 +34,7 @@ export function AdminSidebar() {
             <div className="mt-4 space-y-1">
               <Item to="/admin" label="Classes" />
               <Item to="/admin/users" label="Create Users" />
+              <Item to="/admin/announcements" label="Announcements" />
               <Item to="/admin/profile" label="Profile" />
             </div>
           </div>

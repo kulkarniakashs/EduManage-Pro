@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,4 +30,6 @@ public interface AnnouncementRepository extends JpaRepository<Announcement, UUID
         order by a.publishAt desc, a.createdAt desc
     """)
     List<Announcement> findVisibleForClass(UUID academicYearId, UUID classRoomId, Instant now);
+
+    List<Announcement> findByAcademicYearIdAndClassRoomIdOrderByCreatedAtDesc(UUID academicYearId, UUID classRoomId);
 }

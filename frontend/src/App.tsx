@@ -20,6 +20,7 @@ import { TeacherAttendanceHome } from "./pages/teacher/TeacherAttendanceHome";
 import { TeacherAttendanceSubject } from "./pages/teacher/TeacherAttendanceSubject";
 import { StudentAttendancePage } from "./pages/student/StudentAttendancePage";
 import { StudentVideoPlayer } from "./pages/student/StudentPlayer";
+import { AdminAnnouncementsPage } from "./pages/admin/AdminAnnouncement";
 
 export default function App() {
   return (
@@ -67,6 +68,7 @@ export default function App() {
           />
           <Route path="users" element={<AdminCreateUsersPage />} />
           <Route path="profile" element={<ProfilePage />} />
+          <Route path="announcements" element={<AdminAnnouncementsPage/>} />
         </Route>
         {/* <Route path="*" element={<Navigate to="/student" replace />} /> */}
       </Routes>

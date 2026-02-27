@@ -72,3 +72,10 @@ export type CreateEnrollmentRequest = {
   classRoomId: string;
   studentId: string;
 };
+
+export type AdminAnnouncement = {
+  id: string;
+  title: string;
+  message: string;
+  createdAt: string; // ISO
+};

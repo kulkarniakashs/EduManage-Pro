@@ -58,4 +58,12 @@ public class AdminQueryController {
     ) {
         return adminQueryService.getFeeStructure(academicYearId, classRoomId);
     }
+
+    @GetMapping("/announcements")
+    public List<AdminAnnouncementResponse> listAnnouncements(
+            @RequestParam UUID academicYearId,
+            @RequestParam UUID classRoomId
+    ) {
+        return adminQueryService.listAnnouncements(academicYearId, classRoomId);
+    }
 }

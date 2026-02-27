@@ -20,6 +20,7 @@ public class AdminQueryService {
     private final UserRepository userRepo;
     private final FeeStructureRepository feeRepo;
     private final EnrollmentRepository enrollmentRepo;
+    private final AnnouncementRepository announcementRepository;
 
     public List<AdminStudentOptionResponse> listStudentsNotEnrolled(
             UUID academicYearId,
@@ -110,5 +111,13 @@ public class AdminQueryService {
                 .currency(fs.getCurrency())
                 .active(fs.isActive())
                 .build();
+    }
+
+    public List<AdminAnnouncementResponse> listAnnouncements(UUID academicYearId, UUID classRoomId) {
+        return announcementRepository
+                .findByAcademicYearIdAndClassRoomIdOrderByCreatedAtDesc(academicYearId, classRoomId)
+                .stream()
+                .map(AdminAnnouncementResponse::from)
+                .toList();
     }
 }
