@@ -6,6 +6,7 @@ import com.edumanagepro.entity.enums.*;
 import com.edumanagepro.repository.*;
 import com.edumanagepro.security.UserPrincipal;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.edumanagepro.events.*;
@@ -29,8 +30,9 @@ public class AdminSetupService {
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher events;
 
-    public AcademicYear createAcademicYear(CreateAcademicYearRequest req) {
-        Institute inst = instituteRepository.findById(req.getInstituteId()).orElseThrow();
+    public AcademicYear createAcademicYear(CreateAcademicYearRequest req, @AuthenticationPrincipal UserPrincipal me) {
+        User user = userRepository.findById(me.getId()).orElseThrow();
+        Institute inst = user.getInstitute();
 
         AcademicYear y = new AcademicYear();
         y.setInstitute(inst);
@@ -73,7 +75,7 @@ public class AdminSetupService {
         u.setRole(req.getRole());
         u.setActive(true);
         User saved = userRepository.save(u);
-        events.publishEvent(new UserCreatedEvent(saved.getId(), req.getPassword()));
+        //events.publishEvent(new UserCreatedEvent(saved.getId(), req.getPassword()));
         return saved;
     }
 
@@ -93,7 +95,7 @@ public class AdminSetupService {
         s.setThumbnailUrl(req.getThumbnailUrl()); // optional
         s.setIsActive(true);
         Subject saved = subjectRepository.save(s);
-        events.publishEvent(new TeacherAssignedEvent(saved.getId()));
+        //events.publishEvent(new TeacherAssignedEvent(saved.getId()));
         return saved;
     }
 
@@ -132,7 +134,7 @@ public class AdminSetupService {
         e.setEnrolledAt(Instant.now());
         e.setFeeCleared(false);
         Enrollment enr = enrollmentRepository.save(e);
-        events.publishEvent(new StudentEnrolledEvent(enr.getId()));
+        //events.publishEvent(new StudentEnrolledEvent(enr.getId()));
         return enr;
     }
 

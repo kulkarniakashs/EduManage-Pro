@@ -346,8 +346,8 @@ export function TeacherSubject() {
         onClose={() => setUploadOpen(false)}
         onUploaded={async (moduleId, _newItem) => {
           // refresh content list for that module
-          const items = await teacherApi.listModuleContent(moduleId);
-          setContentByModule((p) => ({ ...p, [moduleId]: items }));
+          // const items = await teacherApi.listModuleContent(moduleId);
+          setContentByModule((p) => ({ ...p, [moduleId]: [...p[moduleId],_newItem]}));
         }}
       />
     </div>

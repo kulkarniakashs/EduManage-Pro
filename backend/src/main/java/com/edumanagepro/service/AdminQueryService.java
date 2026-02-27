@@ -26,7 +26,7 @@ public class AdminQueryService {
             UUID classRoomId
     ) {
 
-        return enrollmentRepo.findStudentsNotEnrolled(academicYearId, classRoomId)
+        return enrollmentRepo.findStudentsNotEnrolled(academicYearId)
                 .stream()
                 .map(user -> new AdminStudentOptionResponse(user.getId(), user.getFullName(), user.getFullName(), user.getProfilePhotoKey())
                 )

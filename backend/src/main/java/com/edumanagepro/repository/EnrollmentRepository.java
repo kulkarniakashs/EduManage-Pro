@@ -30,10 +30,9 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, UUID> {
     AND u.id NOT IN (
         SELECT e.student.id FROM Enrollment e
         WHERE e.academicYear.id = :academicYearId
-        AND e.classRoom.id = :classRoomId
     )
 """)
-    List<User> findStudentsNotEnrolled(UUID academicYearId, UUID classRoomId);
+    List<User> findStudentsNotEnrolled(UUID academicYearId);
 
 
     @Query("""

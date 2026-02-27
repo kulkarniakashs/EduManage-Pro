@@ -56,3 +56,7 @@
 .react-calendar-heatmap .color-absent {
   fill: #fb7185;
 }
+
+.p-datepicker {
+  z-index: 9999 !important;
+}

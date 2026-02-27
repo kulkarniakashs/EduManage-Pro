@@ -6,7 +6,6 @@ import java.util.UUID;
 
 @Getter @Setter
 public class CreateAcademicYearRequest {
-    private UUID instituteId;
     private String name;
     private LocalDate startDate;
     private LocalDate endDate;

@@ -18,8 +18,8 @@ public class AdminController {
     private final AdminSetupService adminSetupService;
 
     @PostMapping("/academic-years")
-    public AcademicYear createAcademicYear(@RequestBody CreateAcademicYearRequest req) {
-        return adminSetupService.createAcademicYear(req);
+    public AcademicYear createAcademicYear(@RequestBody CreateAcademicYearRequest req, @AuthenticationPrincipal UserPrincipal me) {
+        return adminSetupService.createAcademicYear(req, me);
     }
 
     @PostMapping("/classrooms")

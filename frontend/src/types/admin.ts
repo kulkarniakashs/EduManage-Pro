@@ -40,7 +40,7 @@ export type AdminFeeStructure = {
 
 // Requests
 export type CreateClassRoomRequest = { academicYearId: UUID; name: string };
-export type CreateAcademicYearRequest = { name: string; active: boolean };
+export type CreateAcademicYearRequest = { name: string; active: boolean, startDate : string, endDate : string};
 
 export type CreateSubjectRequest = {
   academicYearId: UUID;
