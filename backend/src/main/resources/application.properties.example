@@ -1,0 +1,73 @@
+spring.application.name=EduManage Pro
+
+# ──────────────────────────────────────────────
+# Database (PostgreSQL)
+# ──────────────────────────────────────────────
+spring.datasource.url=jdbc:postgresql://localhost:5432/edumanage-pro
+spring.datasource.username=postgres
+spring.datasource.password=your_db_password
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# ──────────────────────────────────────────────
+# JPA / Hibernate
+# ──────────────────────────────────────────────
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+
+# ──────────────────────────────────────────────
+# JWT
+# ──────────────────────────────────────────────
+app.jwt.secret=your_super_secret_jwt_key_min_32_chars
+app.jwt.expiration-minutes=1440
+
+# ──────────────────────────────────────────────
+# Seed / Bootstrap Admin
+# ──────────────────────────────────────────────
+app.seed.enabled=true
+app.seed.institute.code=EDU001
+app.seed.institute.name=EduManage Institute
+app.seed.admin.email=admin@yourdomain.com
+app.seed.admin.password=change_me_password
+app.seed.admin.fullname=Super Admin
+
+# ──────────────────────────────────────────────
+# Cloudflare R2 (S3-compatible storage)
+# ──────────────────────────────────────────────
+app.r2.endpoint=https://<account-id>.r2.cloudflarestorage.com
+app.r2.access-key=your_r2_access_key
+app.r2.secret-key=your_r2_secret_key
+
+# Public bucket (profile photos / thumbnails)
+app.r2.public.bucket=edumanage
+app.r2.public.base-url=https://pub-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.r2.dev
+app.r2.presign-minutes=10
+
+# Private bucket (course content)
+app.r2.bucket=edumanage-content
+app.r2.presign-upload-minutes=10
+app.r2.presign-view-minutes=25
+
+# ──────────────────────────────────────────────
+# Razorpay
+# ──────────────────────────────────────────────
+razorpay.keyId=rzp_test_your_key_id
+razorpay.keySecret=your_razorpay_key_secret
+razorpay.companyName=EduManage Pro
+
+# ──────────────────────────────────────────────
+# Email (SMTP / Gmail)
+# ──────────────────────────────────────────────
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=you@gmail.com
+spring.mail.password=your_gmail_app_password
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+app.mail.fromName=EduManage Pro
+app.mail.fromEmail=you@gmail.com
+
+# Place logo in backend resources so it can be embedded in emails
+app.mail.logoPath=static/logo.png
